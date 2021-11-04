@@ -1,24 +1,54 @@
-# README
+# テーブル設計
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## usersテーブル
 
-Things you may want to cover:
+| Column             | Type   | Options     |
+| ------------------ | ------ | ----------- |
+| name               | string | null: false |
+| email              | string | null: false |
+| encrypted_password | string | null: false |
 
-* Ruby version
 
-* System dependencies
+Association
 
-* Configuration
+* has_many :tasks
 
-* Database creation
+## tasksテーブル
 
-* Database initialization
+| Column             | Type     | Options     |
+| ------------------ | -------- | ----------- |
+| title              | string   | null: false |
+| description        | text     |             |
+| deadline           | datetime |             |
+| done               | integer  | null: false |
+| priority_number    | integer  | null: false |
+| user_id            | integer  | null: false |
+| label_id           | integer  | null: false |
 
-* How to run the test suite
+Association
 
-* Services (job queues, cache servers, search engines, etc.)
+* belongs_to: user
+* has_many  : task_labels
 
-* Deployment instructions
+## labels
 
-* ...
+| Column             | Type   | Options     |
+| ------------------ | ------ | ----------- |
+| name               | string | null: false |
+
+Association
+
+* has_many  : task_labels
+
+## task_labels
+
+| Column             | Type    | Options     |
+| ------------------ | ------- | ----------- |
+| task_id            | string  | null: false |
+| label_id           | integer | null: false |
+
+
+Association
+
+* belongs_to: task
+* belongs_to: label
