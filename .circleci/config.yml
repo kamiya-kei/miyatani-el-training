@@ -1,0 +1,29 @@
+version: 2.1
+orbs:
+  ruby: circleci/ruby@1.1.2
+
+jobs:
+  rubocop:
+    docker:
+      - image: circleci/ruby:3.0.2-node
+        environment:
+          RAILS_ENV: test
+          POSTGRES_HOST: 127.0.0.1
+      - image: circleci/postgres:13.4
+        environment:
+          POSTGRES_USER: miyatani_el_training
+          POSTGRES_DB: miyatani_el_training_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+    working_directory: ~/miyatani_el_training
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run:
+          name: Rubocop
+          command: bundle exec rubocop
+
+workflows:
+  version: 2
+  rubocop:
+    jobs:
+      - rubocop
