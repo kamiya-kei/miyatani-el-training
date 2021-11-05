@@ -8,6 +8,13 @@ AllCops:
   TargetRubyVersion: 3.0
   TargetRailsVersion: 6.1
   Exclude:
-    - "vendor/**/*"
+    - "vendor/**/*" # rubocop config/default.yml
+    - "db/schema.rb"
+    - "node_modules/**/*"
+    - "config.ru"
+    - "config/puma.rb"
+    - "config/unicorn.rb"
+    - "Capfile"
+    - "**/*.spec"  # .spec file should be an RPM spec file not an RSpec file
     - "bin/**/*"
     - "config/**/*"
