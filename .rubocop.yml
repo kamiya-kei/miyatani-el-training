@@ -1,0 +1,9 @@
+inherit_gem:
+  retrieva-cop:
+    - "config/rubocop.yml"
+    - "config/rails.yml"
+    - "config/rspec.yml"
+
+AllCops:
+  TargetRubyVersion: 3.0
+  TargetRailsVersion: 6.1
