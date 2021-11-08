@@ -1,10 +1,20 @@
 import React from "react";
 import PropTypes from "prop-types";
+import {
+  BrowserRouter,
+  Routes,
+  Route
+} from "react-router-dom";
+import Top from "page/Top";
 
 const App = () => {
   return (
     <>
-      <p>Hello World</p>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Top />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 };
