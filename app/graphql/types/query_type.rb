@@ -7,8 +7,8 @@ module Types
     field :task, TaskType, null: true do
       argument :id, ID, required: true
     end
-    def task(id:)
-      Task.find(id)
+    def task(id: nil)
+      Task.find_by(id: id)
     end
     field :tasks, resolver: Resolvers::Tasks
   end
