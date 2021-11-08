@@ -8,7 +8,7 @@ module Mutations
     argument :description, String, required: false
 
     def resolve(**args)
-      task = Task.find_by_id(args[:id])
+      task = Task.find_by(id: args[:id])
       task&.update(args.except(:id))
       {
         task: task,

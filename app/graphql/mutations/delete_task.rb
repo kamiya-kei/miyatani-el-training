@@ -3,10 +3,10 @@ module Mutations
     field :task,   Types::TaskType, null: true
     field :result, Boolean,         null: true
 
-    argument :id,          ID,     required: true
+    argument :id, ID, required: true
 
     def resolve(id: nil)
-      task = Task.find_by_id(id)
+      task = Task.find_by(id: id)
       task&.destroy
       {
         task: task,
