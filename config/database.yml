@@ -84,3 +84,4 @@ production:
   database: miyatani_el_training_production
   username: miyatani_el_training
   password: <%= ENV['MIYATANI_EL_TRAINING_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
