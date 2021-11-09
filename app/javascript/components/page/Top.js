@@ -9,7 +9,15 @@ import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import axios from 'module/axios_with_csrf';
+import dayjs from 'module/dayjs_tz';
 import BaseLayout from "BaseLayout";
+
+const TaskCard = styled(Card)(
+  ({theme}) => `
+  max-width: 600px;
+  margin: 15px;
+`,
+);
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
@@ -38,8 +46,11 @@ const Top = () => {
   return (
     <BaseLayout>
       {tasks.map(task=> (
-        <Card key={task.id} style={{maxWidth: '600px', margin: '15px'}}>
-          <CardHeader title={task.title} />
+        <TaskCard key={task.id}>
+          <CardHeader
+            title={task.title}
+            subheader={dayjs.tz(task.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+          />
           <CardContent>{task.description}</CardContent>
           <CardActions>
             <Stack spacing={2} direction="row">
@@ -47,7 +58,7 @@ const Top = () => {
               <Button variant="contained" size="small" color="secondary">削除</Button>
             </Stack>
           </CardActions>
-        </Card>
+        </TaskCard>
       ))}
     </BaseLayout>
   );
