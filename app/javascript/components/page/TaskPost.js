@@ -31,7 +31,7 @@ const TaskPost = () => {
       `,
       })
       .then(res => {
-        navigate('/');
+        navigate('/', {state: {message: 'タスクを投稿しました'}});
       })
       .catch(error => {
         alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');

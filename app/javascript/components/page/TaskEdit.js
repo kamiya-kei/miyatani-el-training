@@ -57,7 +57,7 @@ const TaskEdit = () => {
       })
       .then(res => {
         console.log(res);
-        navigate('/');
+        navigate('/', {state: {message: 'タスクを更新しました'}});
       })
       .catch(error => {
         alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');

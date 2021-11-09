@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { styled } from '@mui/system';
 import Card from '@mui/material/Card';
@@ -8,19 +9,16 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
 import BaseLayout from "BaseLayout";
-
-const TaskCard = styled(Card)(
-  ({theme}) => `
-  max-width: 600px;
-  margin: 15px;
-`,
-);
+import TaskCard from "common/TaskCard";
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
+  const [open, setOpen] = useState(true);
+  const { state } = useLocation();
 
   useEffect(() => {
     axios.post('/graphql', {
@@ -45,6 +43,12 @@ const Top = () => {
 
   return (
     <BaseLayout>
+      {(state && open) &&
+        <div style={{margin: '20px 0'}}>
+          <Alert severity="success" onClose={() => {setOpen(false)}}>{state.message}</Alert>
+        </div>
+      }
+
       {tasks.map(task=> (
         <TaskCard key={task.id}>
           <CardHeader
