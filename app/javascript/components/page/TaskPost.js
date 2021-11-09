@@ -10,15 +10,14 @@ const TaskPost = () => {
   const navigate = useNavigate();
   const formRef = createRef();
 
-  const handleAdd = () => {
-    const formData = new FormData(formRef.current);
+  const handleAdd = (data) => {
     axios.post('/graphql', {
       query: `
         mutation {
           createTask(
             input:{
-              title: "${formData.get('title')}"
-              description: "${formData.get('description')}"
+              title: "${data.title}"
+              description: "${data.description}"
             }
           ) {
             task {
@@ -42,9 +41,7 @@ const TaskPost = () => {
 
   return (
     <BaseLayout>
-      <TaskForm title="タスク投稿フォーム" task={{}} ref={formRef}>
-        <Button variant="contained" size="small" color="primary" onClick={handleAdd}>投稿</Button>
-      </TaskForm>
+      <TaskForm title="タスク投稿フォーム" task={{}} buttonText="投稿" onAction={handleAdd} />
     </BaseLayout>
   );
 };
