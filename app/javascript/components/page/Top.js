@@ -9,7 +9,7 @@ import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import axios from 'module/axios_with_csrf';
-import dayjs from 'module/dayjs_tz';
+import dayjs from 'dayjs';
 import BaseLayout from "BaseLayout";
 
 const TaskCard = styled(Card)(
@@ -49,7 +49,7 @@ const Top = () => {
         <TaskCard key={task.id}>
           <CardHeader
             title={task.title}
-            subheader={dayjs.tz(task.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+            subheader={dayjs(task.createdAt).format('YYYY-MM-DD HH:mm:ss')}
           />
           <CardContent>{task.description}</CardContent>
           <CardActions>
