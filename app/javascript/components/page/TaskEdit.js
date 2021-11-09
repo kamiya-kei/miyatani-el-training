@@ -2,7 +2,6 @@ import React, { useState, useEffect, createRef } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from 'react-router-dom';
 import { useParams } from "react-router-dom";
-import Button from '@mui/material/Button';
 import axios from 'module/axios_with_csrf';
 import BaseLayout from "BaseLayout";
 import TaskForm from "common/TaskForm";
@@ -35,16 +34,15 @@ const TaskEdit = () => {
       });
   }, []);
 
-  const handleEdit = () => {
-    const formData = new FormData(formRef.current);
+  const handleEdit = (data) => {
     axios.post('/graphql', {
       query: `
         mutation {
           updateTask(
             input:{
               id: ${params.id}
-              title: "${formData.get('title')}"
-              description: "${formData.get('description')}"
+              title: "${data.title}"
+              description: "${data.description}"
             }
           ){
             task {
@@ -70,9 +68,7 @@ const TaskEdit = () => {
   return (
     <BaseLayout>
       {task.id &&
-        <TaskForm title="タスク編集" task={task} ref={formRef}>
-          <Button variant="contained" size="small" color="primary" onClick={handleEdit}>更新</Button>
-        </TaskForm>
+        <TaskForm title="タスク編集" task={task} buttonText="更新" onAction={handleEdit} />
       }
     </BaseLayout>
   );
