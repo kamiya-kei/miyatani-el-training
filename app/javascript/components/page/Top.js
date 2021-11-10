@@ -50,6 +50,35 @@ const Top = () => {
     setFlashMessage(state.message);
   }, [state]);
 
+  const handleDelete = (id) => {
+    console.log(id);
+    axios.post('/graphql', {
+      query: `
+        mutation {
+          deleteTask(
+            input:{
+              id: ${id}
+            }
+          ){
+            task {
+              id
+            }
+          }
+        }
+      `})
+      .then(res => {
+        // 削除を画面に反映
+        setTasks(tasks.filter(task=>task.id != id));//削除したタスク以外のタスクを残して再セット
+        // フラッシュメッセージ表示
+        setOpen(true);
+        setFlashMessage('タスクが削除されました');
+      })
+      .catch(error => {
+        alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
+        console.error(error);
+      });
+  };
+
   return (
     <BaseLayout>
       <Snackbar
@@ -71,7 +100,7 @@ const Top = () => {
           <CardActions>
             <Stack spacing={2} direction="row">
               <Button component={Link} to={`/tasks/${task.id}/edit`} variant="contained" size="small" color="primary">編集</Button>
-              <Button variant="contained" size="small" color="secondary">削除</Button>
+              <Button variant="contained" size="small" color="secondary" onClick={()=>{handleDelete(task.id)}}>削除</Button>
             </Stack>
           </CardActions>
         </TaskCard>
