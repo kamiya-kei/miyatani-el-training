@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { styled } from '@mui/system';
-import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
@@ -15,12 +13,14 @@ import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
 import BaseLayout from "BaseLayout";
 import TaskCard from "common/TaskCard";
+import ConfirmDialog from "common/ConfirmDialog";
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
   const [open, setOpen] = useState(false);
   const [flashMessage, setFlashMessage] = useState('');
   const { state } = useLocation();
+  const confirmDialogRef = useRef();
 
   useEffect(() => {
     axios.post('/graphql', {
@@ -50,8 +50,10 @@ const Top = () => {
     setFlashMessage(state.message);
   }, [state]);
 
-  const handleDelete = (id) => {
-    console.log(id);
+  const handleDelete = async (id) => {
+    const is_agree = await confirmDialogRef.current.confirm();
+    if (!is_agree) { return; }
+
     axios.post('/graphql', {
       query: `
         mutation {
@@ -81,6 +83,7 @@ const Top = () => {
 
   return (
     <BaseLayout>
+      <ConfirmDialog ref={confirmDialogRef} />
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={open}
