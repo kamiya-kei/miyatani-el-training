@@ -5,7 +5,7 @@ module Mutations
     argument :id, ID, required: true
 
     def resolve(id: nil)
-      task = Task.find(id: id)
+      task = Task.find(id)
       task.destroy!
       {
         task: task
