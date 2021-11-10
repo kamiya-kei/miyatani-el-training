@@ -10,6 +10,7 @@ import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
 import BaseLayout from "BaseLayout";
@@ -17,7 +18,8 @@ import TaskCard from "common/TaskCard";
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [flashMessage, setFlashMessage] = useState('');
   const { state } = useLocation();
 
   useEffect(() => {
@@ -41,13 +43,23 @@ const Top = () => {
       });
   }, []);
 
+  useEffect(() => {
+    if (!state) { return; }
+    // タスク作成・編集画面から戻ってきた時にフラッシュメッセージを表示する
+    setOpen(true);
+    setFlashMessage(state.message);
+  }, [state]);
+
   return (
     <BaseLayout>
-      {(state && open) &&
-        <div style={{margin: '20px 0'}}>
-          <Alert severity="success" onClose={() => {setOpen(false)}}>{state.message}</Alert>
-        </div>
-      }
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={() => {setOpen(false)}}
+      >
+        <Alert severity="success" onClose={() => {setOpen(false)}}>{flashMessage} </Alert>
+      </Snackbar>
 
       {tasks.map(task=> (
         <TaskCard key={task.id}>
