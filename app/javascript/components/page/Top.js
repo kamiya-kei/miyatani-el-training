@@ -7,20 +7,18 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
 import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
 import BaseLayout from "BaseLayout";
 import TaskCard from "common/TaskCard";
 import ConfirmDialog from "common/ConfirmDialog";
+import FlashMessage from "common/FlashMessage";
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [flashMessage, setFlashMessage] = useState('');
   const { state } = useLocation();
   const confirmDialogRef = useRef();
+  const flashMessageRef = useRef();
 
   useEffect(() => {
     axios.post('/graphql', {
@@ -46,8 +44,7 @@ const Top = () => {
   useEffect(() => {
     if (!state) { return; }
     // タスク作成・編集画面から戻ってきた時にフラッシュメッセージを表示する
-    setOpen(true);
-    setFlashMessage(state.message);
+    flashMessageRef.current.showMessage(state.message);
   }, [state]);
 
   const handleDelete = async (id) => {
@@ -72,8 +69,7 @@ const Top = () => {
         // 削除を画面に反映
         setTasks(tasks.filter(task=>task.id != id));//削除したタスク以外のタスクを残して再セット
         // フラッシュメッセージ表示
-        setOpen(true);
-        setFlashMessage('タスクが削除されました');
+        flashMessageRef.current.showMessage('タスクが削除されました');
       })
       .catch(error => {
         alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
@@ -84,14 +80,7 @@ const Top = () => {
   return (
     <BaseLayout>
       <ConfirmDialog ref={confirmDialogRef} />
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={open}
-        autoHideDuration={6000}
-        onClose={() => {setOpen(false)}}
-      >
-        <Alert severity="success" onClose={() => {setOpen(false)}}>{flashMessage} </Alert>
-      </Snackbar>
+      <FlashMessage ref={flashMessageRef} />
 
       {tasks.map(task=> (
         <TaskCard key={task.id}>
