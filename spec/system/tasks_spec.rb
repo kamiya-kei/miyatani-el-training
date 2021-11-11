@@ -30,7 +30,7 @@ RSpec.describe 'Tasks', type: :system do
       # 何も入力せず空のまま投稿
       expect {
         click_button '投稿'
-      }.not_to change { Task.count }
+      }.not_to(change { Task.count })
       # バリデーションエラーが表示される
       expect(page).to have_content('タイトルを入力してください')
     end
@@ -42,7 +42,7 @@ RSpec.describe 'Tasks', type: :system do
       fill_in 'description', with: task.description
       expect {
         click_link 'キャンセル'
-      }.not_to change { Task.count }
+      }.not_to(change { Task.count })
 
       # タスク一覧でタスクが投稿されていないことを確認
       expect(page).to have_no_content(task.title)
@@ -73,7 +73,7 @@ RSpec.describe 'Tasks', type: :system do
         fill_in 'description', with: task_after.description
         expect {
           click_button '更新'
-        }.not_to change { Task.count }
+        }.not_to(change { Task.count })
         expect(page).to have_current_path('/')
         expect(page).to have_content('タスクを更新しました')
 
@@ -94,7 +94,7 @@ RSpec.describe 'Tasks', type: :system do
         fill_in 'description', with: task_after.description
         expect {
           click_link 'キャンセル'
-        }.not_to change { Task.count }
+        }.not_to(change { Task.count })
         expect(page).to have_current_path('/')
 
         # タスク一覧でタスクが更新されていないことを確認
@@ -127,7 +127,7 @@ RSpec.describe 'Tasks', type: :system do
         sleep 1 # 確認ダイアログの表示アニメーションを待つ
         expect {
           click_button 'いいえ'
-        }.not_to change { Task.count }
+        }.not_to(change { Task.count })
         expect(page).to have_content(task.title)
         expect(page).to have_content(task.description)
       end

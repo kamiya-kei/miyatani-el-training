@@ -24,6 +24,3 @@ RSpec/ExampleLength:
 RSpec/MultipleExpectations:
   Exclude:
     - 'spec/system/**/*'
-Lint/AmbiguousBlockAssociation:
-  Exclude:
-    - 'spec/system/**/*'
