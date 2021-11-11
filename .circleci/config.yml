@@ -71,11 +71,12 @@ workflows:
   version: 2
   rubocop_and_test:
     jobs:
-      - rubocop
-      - test:
-          requires:
-            - rubocop
-      - notify:
-          context: slack-secrets
-          requires:
-            - test
+      - notify
+      # - rubocop
+      # - test:
+      #     requires:
+      #       - rubocop
+      # - notify:
+      #     context: slack-secrets
+      #     requires:
+      #       - test
