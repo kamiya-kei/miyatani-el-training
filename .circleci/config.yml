@@ -30,7 +30,7 @@ jobs:
           POSTGRES_USER: miyatani_el_training
           POSTGRES_DB: miyatani_el_training_test
           POSTGRES_PASSWORD: ""
-          # POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_HOST_AUTH_METHOD: trust
     environment:
       RAILS_ENV: test
       APP_DATABASE_HOST: "127.0.0.1"
