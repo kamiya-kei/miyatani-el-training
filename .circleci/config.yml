@@ -7,11 +7,13 @@ commands:
   notify_failed:
     steps:
       - slack/notify:
+          channel: $SLACK_DEFAULT_CHANNEL
           event: fail
           template: basic_fail_1
   notify_passed:
     steps:
       - slack/notify:
+          channel: $SLACK_DEFAULT_CHANNEL
           event: always
           template: basic_success_1
 
@@ -63,7 +65,7 @@ jobs:
       - notify_failed
   notify:
     docker:
-      - image: circleci/ruby:3.0.2-node-browsers-legacy
+      - image: cimg/base:stable
     steps:
       - notify_passed
 
@@ -71,7 +73,8 @@ workflows:
   version: 2
   rubocop_and_test:
     jobs:
-      - notify
+      - notify:
+          context: slack-secrets
       # - rubocop
       # - test:
       #     requires:
