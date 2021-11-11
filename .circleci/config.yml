@@ -13,7 +13,7 @@ commands:
     steps:
       - slack/notify:
           event: always
-          template: basic_success_1
+          template: basic_on_hold_1
 
 jobs:
   rubocop:
@@ -68,7 +68,7 @@ jobs:
       - notify_passed
 
 workflows:
-  version: 2
+  version: 2.1
   rubocop_and_test:
     jobs:
       - notify
