@@ -8,6 +8,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import TaskCard from "common/TaskCard";
 import FormItem from "common/FormItem";
+import DeadLine from "common/DeadLine";
 import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
 
@@ -41,6 +42,9 @@ const TaskForm = (props) => {
               defaultValue={props.task.description || ''}
               {...register('description')}
             />
+          </FormItem>
+          <FormItem>
+            <DeadLine register={register} />
           </FormItem>
         </CardContent>
         <CardActions>
