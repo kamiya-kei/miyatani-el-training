@@ -14,21 +14,7 @@ commands:
       - slack/notify:
           event: always
           channel: 'C02LRP1HK7Y'
-          custom: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "plain_text",
-                      "text": "*success*",
-                      "emoji": true
-                    }
-                  ]
-                }
-              ]
-            }
+          template: basic_success_1
 
 jobs:
   rubocop:
