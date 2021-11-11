@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
   ruby: circleci/ruby@1.1.2
+  slack: circleci/slack@4.4.4
 
 jobs:
   rubocop:
@@ -55,3 +56,7 @@ workflows:
       - test:
           requires:
             - rubocop
+      - slack/status:
+          success_message: ':circleci-pass: $CIRCLE_BRANCH のテストが完了しました'
+          failure_message: ':circleci-fail: $CIRCLE_BRANCH のテストが失敗しました'
+          webhook: '${SLACK_WEBHOOK}'
