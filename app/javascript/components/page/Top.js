@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import PropTypes from "prop-types";
+import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { styled } from '@mui/system';
-import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
@@ -11,16 +10,15 @@ import Button from '@mui/material/Button';
 import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
 import BaseLayout from "BaseLayout";
-
-const TaskCard = styled(Card)(
-  ({theme}) => `
-  max-width: 600px;
-  margin: 15px;
-`,
-);
+import TaskCard from "common/TaskCard";
+import ConfirmDialog from "common/ConfirmDialog";
+import FlashMessage from "common/FlashMessage";
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
+  const { state } = useLocation();
+  const confirmDialogRef = useRef();
+  const flashMessageRef = useRef();
 
   useEffect(() => {
     axios.post('/graphql', {
@@ -43,8 +41,47 @@ const Top = () => {
       });
   }, []);
 
+  useEffect(() => {
+    if (!state) { return; }
+    // タスク作成・編集画面から戻ってきた時にフラッシュメッセージを表示する
+    flashMessageRef.current.showMessage(state.message);
+  }, [state]);
+
+  const handleDelete = async (id) => {
+    const is_agree = await confirmDialogRef.current.confirm();
+    if (!is_agree) { return; }
+
+    axios.post('/graphql', {
+      query: `
+        mutation {
+          deleteTask(
+            input:{
+              id: ${id}
+            }
+          ){
+            task {
+              id
+            }
+          }
+        }
+      `})
+      .then(res => {
+        // 削除を画面に反映
+        setTasks(tasks.filter(task=>task.id != id));//削除したタスク以外のタスクを残して再セット
+        // フラッシュメッセージ表示
+        flashMessageRef.current.showMessage('タスクが削除されました');
+      })
+      .catch(error => {
+        alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
+        console.error(error);
+      });
+  };
+
   return (
     <BaseLayout>
+      <ConfirmDialog ref={confirmDialogRef} />
+      <FlashMessage ref={flashMessageRef} />
+
       {tasks.map(task=> (
         <TaskCard key={task.id}>
           <CardHeader
@@ -55,7 +92,7 @@ const Top = () => {
           <CardActions>
             <Stack spacing={2} direction="row">
               <Button component={Link} to={`/tasks/${task.id}/edit`} variant="contained" size="small" color="primary">編集</Button>
-              <Button variant="contained" size="small" color="secondary">削除</Button>
+              <Button variant="contained" size="small" color="secondary" onClick={()=>{handleDelete(task.id)}}>削除</Button>
             </Stack>
           </CardActions>
         </TaskCard>

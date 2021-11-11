@@ -6,6 +6,8 @@ import {
   Route
 } from "react-router-dom";
 import Top from "page/Top";
+import TaskPost from "page/TaskPost";
+import TaskEdit from "page/TaskEdit";
 
 const App = () => {
   return (
@@ -13,6 +15,8 @@ const App = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Top />} />
+          <Route path="/tasks/new" element={<TaskPost />} />
+          <Route path="/tasks/:id/edit" element={<TaskEdit />} />
         </Routes>
       </BrowserRouter>
     </>
