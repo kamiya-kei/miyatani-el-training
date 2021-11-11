@@ -133,4 +133,25 @@ RSpec.describe 'Tasks', type: :system do
       end
     end
   end
+
+  describe 'タスク一覧' do
+    before do
+      tasks.map(&:save)
+    end
+
+    let(:tasks) {
+      [
+        FactoryBot.build(:task, created_at: '2021-11-01 00:00:00'),
+        FactoryBot.build(:task, created_at: '2021-11-02 00:00:00'),
+        FactoryBot.build(:task, created_at: '2021-11-03 00:00:00')
+      ]
+    }
+
+    context '並び順' do
+      it '作成日時降順' do
+        visit root_path
+        page.body.should =~ /#{tasks[2].title}.*#{tasks[1].title}.*#{tasks[0].title}/
+      end
+    end
+  end
 end
