@@ -13,7 +13,21 @@ commands:
     steps:
       - slack/notify:
           event: always
-          template: basic_on_hold_1
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "plain_text",
+                      "text": "*success*",
+                      "emoji": true
+                    }
+                  ]
+                }
+              ]
+            }
 
 jobs:
   rubocop:
