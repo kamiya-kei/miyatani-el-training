@@ -12,7 +12,7 @@ commands:
   notify_passed:
     steps:
       - slack/notify:
-          event: pass
+          event: always
           template: basic_success_1
 
 jobs:
@@ -76,5 +76,6 @@ workflows:
           requires:
             - rubocop
       - notify:
+          context: slack-secrets
           requires:
             - test
