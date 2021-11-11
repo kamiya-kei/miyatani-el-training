@@ -62,7 +62,8 @@ jobs:
           command: bundle exec rspec
       - notify_failed
   notify:
-    executor: plain
+    docker:
+      - image: circleci/ruby:3.0.2-node-browsers-legacy
     steps:
       - notify_passed
 
