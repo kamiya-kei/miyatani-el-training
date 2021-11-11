@@ -1,7 +1,6 @@
 version: 2.1
 orbs:
   ruby: circleci/ruby@1.1.2
-  node: circleci/node@2
 
 jobs:
   rubocop:
@@ -39,10 +38,7 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
-      - node/install-packages: 
-          pkg-manager: yarn
-          cache-key: "yarn.lock"
-      # - run: yarn install
+      - run: yarn install
       - run: bundle exec rake db:create
       - run: bundle exec rake db:schema:load
       - run:
