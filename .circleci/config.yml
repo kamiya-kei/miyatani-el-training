@@ -1,7 +1,19 @@
 version: 2.1
 orbs:
   ruby: circleci/ruby@1.1.2
-  slack: circleci/slack@3.4.2
+  slack: circleci/slack@4.4.4
+
+commands:
+  notify_failed:
+    steps:
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+  notify_passed:
+    steps:
+      - slack/notify:
+          event: pass
+          template: basic_success_1
 
 jobs:
   rubocop:
@@ -24,6 +36,7 @@ jobs:
       - run:
           name: Rubocop
           command: bundle exec rubocop
+      - notify_failed
   test:
     docker:
       - image: circleci/ruby:3.0.2-node-browsers-legacy
@@ -47,6 +60,11 @@ jobs:
       - run:
           name: Rspec
           command: bundle exec rspec
+      - notify_failed
+  notify:
+    executor: plain
+    steps:
+      - notify_passed
 
 workflows:
   version: 2
@@ -56,7 +74,6 @@ workflows:
       - test:
           requires:
             - rubocop
-      - slack/status:
-          success_message: ':circleci-pass: $CIRCLE_BRANCH のテストが完了しました'
-          failure_message: ':circleci-fail: $CIRCLE_BRANCH のテストが失敗しました'
-          webhook: '${SLACK_WEBHOOK}'
+      - notify:
+          requires:
+            - test
