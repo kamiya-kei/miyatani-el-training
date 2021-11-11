@@ -7,13 +7,11 @@ commands:
   notify_failed:
     steps:
       - slack/notify:
-          channel: $SLACK_DEFAULT_CHANNEL
           event: fail
           template: basic_fail_1
   notify_passed:
     steps:
       - slack/notify:
-          channel: $SLACK_DEFAULT_CHANNEL
           event: always
           template: basic_success_1
 
