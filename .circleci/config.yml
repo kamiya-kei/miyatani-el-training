@@ -13,7 +13,7 @@ commands:
     steps:
       - slack/notify:
           event: always
-          channel: 'xxxxHK7Y,C02LRP1HK7Y'
+          channel: 'xxxxHK7Y'
           custom: |
             {
               "blocks": [
