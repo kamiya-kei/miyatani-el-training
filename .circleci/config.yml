@@ -1,19 +1,36 @@
 version: 2.1
 orbs:
   ruby: circleci/ruby@1.1.2
+  slack: circleci/slack@4.4.4
+
+commands:
+  notify_failed:
+    steps:
+      - slack/notify:
+          event: fail
+          channel: $SLACK_CHANNEL
+          template: basic_fail_1
+  notify_passed:
+    steps:
+      - slack/notify:
+          event: always
+          channel: $SLACK_CHANNEL
+          template: basic_success_1
 
 jobs:
   rubocop:
     docker:
-      - image: circleci/ruby:3.0.2-node
-        environment:
-          RAILS_ENV: test
-          POSTGRES_HOST: 127.0.0.1
+      - image: circleci/ruby:3.0.2-node-browsers-legacy
       - image: circleci/postgres:13.4
         environment:
           POSTGRES_USER: miyatani_el_training
           POSTGRES_DB: miyatani_el_training_test
+          POSTGRES_PASSWORD: ""
           POSTGRES_HOST_AUTH_METHOD: trust
+    environment:
+      RAILS_ENV: test
+      APP_DATABASE_HOST: "127.0.0.1"
+      DB_USER: miyatani_el_training
     working_directory: ~/miyatani_el_training
     steps:
       - checkout
@@ -21,9 +38,46 @@ jobs:
       - run:
           name: Rubocop
           command: bundle exec rubocop
+      - notify_failed
+  test:
+    docker:
+      - image: circleci/ruby:3.0.2-node-browsers-legacy
+      - image: circleci/postgres:13.4
+        environment:
+          POSTGRES_USER: miyatani_el_training
+          POSTGRES_DB: miyatani_el_training_test
+          POSTGRES_PASSWORD: ""
+          POSTGRES_HOST_AUTH_METHOD: trust
+    environment:
+      RAILS_ENV: test
+      APP_DATABASE_HOST: "127.0.0.1"
+      DB_USER: miyatani_el_training
+    working_directory: ~/miyatani_el_training
+    steps:
+      - checkout
+      - ruby/install-deps
+      - run: yarn install
+      - run: bundle exec rake db:create
+      - run: bundle exec rake db:schema:load
+      - run:
+          name: Rspec
+          command: bundle exec rspec
+      - notify_failed
+  notify:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - notify_passed
 
 workflows:
-  version: 2
-  rubocop:
+  version: 2.1
+  rubocop_and_test:
     jobs:
       - rubocop
+      - test:
+          requires:
+            - rubocop
+      - notify:
+          context: slack-secrets
+          requires:
+            - test
