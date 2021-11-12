@@ -16,6 +16,20 @@ import FlashMessage from "common/FlashMessage";
 import Box from '@mui/material/Box';
 import { datetime_format } from 'utils/constants';
 import SortForm from "common/SortForm";
+import Typography from '@mui/material/Typography';
+import Chip from '@mui/material/Chip';
+
+const DoneChip = (props) => {
+  const COLORS = {
+    '-1': 'default',
+    '0' : 'warning',
+    '1' : 'success' 
+  };
+  const color = COLORS[props.done.id];
+  return (
+    <Chip label={props.done.text} color={color} size="small" />
+  );
+};
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
@@ -32,6 +46,10 @@ const Top = () => {
             title
             description
             deadline
+            done {
+              id
+              text
+            }
             createdAt
           }
         }
@@ -102,7 +120,14 @@ const Top = () => {
       {tasks.map(task=> (
         <TaskCard key={task.id}>
           <CardHeader
-            title={task.title}
+            title={
+              <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div>{task.title}</div>
+                <div>
+                  <DoneChip done={task.done} />
+                </div>
+              </Box>
+            }
             subheader={
               <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
