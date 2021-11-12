@@ -5,14 +5,14 @@ import DateTimePicker from '@mui/lab/DateTimePicker';
 import TextField from '@mui/material/TextField';
 import DateAdapter from '@mui/lab/AdapterDayjs';
 import dayjs from 'dayjs';
-import { datetime_format } from 'utils/constants';
+import { DATETIME_FORMAT } from 'utils/constants';
 
 const DeadLine = (props) => {
   const [value, setValue] = useState(new Date(props.defaultValue || ''));
 
   const handleChange = (newValue) => {
     setValue(newValue);
-    const newValueString = dayjs(newValue.$d).format(datetime_format);
+    const newValueString = dayjs(newValue.$d).format(DATETIME_FORMAT);
     props.setValue('deadline', newValueString);
   };
 

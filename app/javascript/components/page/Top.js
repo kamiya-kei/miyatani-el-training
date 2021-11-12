@@ -14,7 +14,7 @@ import TaskCard from "common/TaskCard";
 import ConfirmDialog from "common/ConfirmDialog";
 import FlashMessage from "common/FlashMessage";
 import Box from '@mui/material/Box';
-import { datetime_format } from 'utils/constants';
+import { DATETIME_FORMAT } from 'utils/constants';
 import SortForm from "common/SortForm";
 
 const Top = () => {
@@ -107,11 +107,11 @@ const Top = () => {
               <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
                   作成日時:
-                  {dayjs(task.createdAt).format(datetime_format)}
+                  {dayjs(task.createdAt).format(DATETIME_FORMAT)}
                 </div>
                 <div>
                   期限:
-                  {task.deadline ? dayjs(task.deadline).format(datetime_format) : '--'}
+                  {task.deadline ? dayjs(task.deadline).format(DATETIME_FORMAT) : '--'}
                 </div>
               </Box>
             }
