@@ -45,7 +45,10 @@ const TaskForm = (props) => {
             />
           </FormItem>
           <FormItem>
-            <DeadLine register={register} setValue={setValue} errors={errors} />
+            <DeadLine
+              register={register} setValue={setValue} errors={errors}
+              defaultValue={props.task.deadline}
+            />
           </FormItem>
         </CardContent>
         <CardActions>
