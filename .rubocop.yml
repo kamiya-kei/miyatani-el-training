@@ -18,9 +18,3 @@ AllCops:
     - "**/*.spec"  # .spec file should be an RPM spec file not an RSpec file
     - "bin/**/*"
     - "config/**/*"
-RSpec/ExampleLength:
-  Exclude:
-    - 'spec/system/**/*'
-RSpec/MultipleExpectations:
-  Exclude:
-    - 'spec/system/**/*'

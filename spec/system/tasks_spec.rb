@@ -1,133 +1,181 @@
 require 'rails_helper'
 
 RSpec.describe 'Tasks', type: :system do
-  describe 'タスク作成' do
+  describe 'タスクの作成' do
     let(:task) { FactoryBot.build(:task) }
 
-    it 'タスク作成実行' do
-      visit root_path
-      expect(page).to have_content('タスク作成')
-      click_link 'タスク作成' # タスク作成ページへ
-      expect(page).to have_current_path('/tasks/new')
-
-      # 値を入力して投稿
-      fill_in 'title', with: task.title
-      fill_in 'description', with: task.description
-      expect {
-        click_button '投稿'
-      }.to change { Task.count }.by(1)
-      expect(page).to have_current_path('/')
-      expect(page).to have_content('タスクを投稿しました')
-
-      # タスク一覧でタスクが投稿されていることを確認
-      expect(page).to have_content(task.title)
-      expect(page).to have_content(task.description)
+    describe 'タスク一覧ページのタスク作成リンクのクリック' do
+      subject {
+        visit root_path
+        click_link 'タスク作成' # タスク作成ページへ
+        page
+      }
+      it { is_expected.to have_current_path('/tasks/new') }
     end
 
-    it 'タスク作成時のバリデーションエラーメッセージの表示' do
-      visit 'tasks/new'
-      expect(page).to have_no_content('タイトルを入力してください')
-      # 何も入力せず空のまま投稿
-      expect {
+    describe '入力して投稿' do
+      subject {
+        visit 'tasks/new'
+        fill_in 'title', with: task.title
+        fill_in 'description', with: task.description
         click_button '投稿'
-      }.not_to(change { Task.count })
-      # バリデーションエラーが表示される
-      expect(page).to have_content('タイトルを入力してください')
+        page
+      }
+      it { expect { subject }.to change { Task.count }.from(0).to(1) }
+      it { is_expected.to have_current_path('/') }
+      it { is_expected.to have_content('タスクを投稿しました') }
+
+      it '投稿されたタスクがタスク一覧に表示されている' do
+        subject
+        expect(page).to have_content(task.title)
+        expect(page).to have_content(task.description)
+      end
     end
 
-    it 'タスク作成キャンセル' do
-      visit 'tasks/new'
-      # 値を入力してキャンセル
-      fill_in 'title', with: task.title
-      fill_in 'description', with: task.description
-      expect {
+    describe '何も入力せずに投稿' do
+      subject {
+        visit 'tasks/new'
+        click_button '投稿'
+      }
+      it { is_expected.to have_no_content('タイトルを入力してください') }
+      it { expect { subject }.not_to(change { Task.count }) }
+    end
+
+    describe '入力するがキャンセル' do
+      subject {
+        visit 'tasks/new'
+        fill_in 'title', with: task.title
+        fill_in 'description', with: task.description
         click_link 'キャンセル'
-      }.not_to(change { Task.count })
+        page
+      }
+      it { expect { subject }.not_to(change { Task.count }) }
 
-      # タスク一覧でタスクが投稿されていないことを確認
-      expect(page).to have_no_content(task.title)
-      expect(page).to have_no_content(task.description)
+      it '投稿されたタスクがタスク一覧に表示されている' do
+        subject
+        expect(page).to have_no_content(task.title)
+        expect(page).to have_no_content(task.description)
+      end
     end
   end
 
-  describe 'タスク編集・削除' do
-    before do
-      task.save
-    end
-
-    let(:task) { FactoryBot.build(:task) }
+  describe 'タスクの編集' do
+    let!(:task) { FactoryBot.create(:task) }
+    let(:task_edit_path) { "/tasks/#{task.id}/edit" }
     let(:task_after) { FactoryBot.build(:task) }
 
-    context 'タスク編集' do
-      it 'タスク編集実行' do
+    describe 'タスク一覧の編集ボタンをクリック' do
+      subject {
         visit root_path
         click_link '編集' # 編集ページへ
-        expect(page).to have_current_path("/tasks/#{task.id}/edit", ignore_query: true)
+        page
+      }
+      it { is_expected.to have_current_path(task_edit_path, ignore_query: true) }
 
-        # 変更前の値が入力欄にセットされている
+      it '元の値が入力欄にセットされている' do
+        subject
         expect(find_field('title').value).to eq(task.title)
         expect(find_field('description').value).to eq(task.description)
+      end
+    end
 
-        # 新しい値を入力して更新
+    describe 'タスクの編集を実行' do
+      subject {
+        visit task_edit_path
         fill_in 'title', with: task_after.title
         fill_in 'description', with: task_after.description
-        expect {
-          click_button '更新'
-        }.not_to(change { Task.count })
-        expect(page).to have_current_path('/')
-        expect(page).to have_content('タスクを更新しました')
+        click_button '更新'
+        page
+      }
+      it { expect { subject }.not_to(change { Task.count }) }
+      it { is_expected.to have_current_path('/') }
+      it { is_expected.to have_content('タスクを更新しました') }
 
-        # タスク一覧でタスクが更新されていることを確認
+      it 'タスク一覧に更新前のタスクの内容が表示されていない' do
+        subject
         expect(page).to have_no_content(task.title)
         expect(page).to have_no_content(task.description)
+      end
+
+      it 'タスク一覧に更新後のタスクの内容が表示されている' do
+        subject
         expect(page).to have_content(task_after.title)
         expect(page).to have_content(task_after.description)
       end
+    end
 
-      it 'タスク編集キャンセル' do
-        # visit root_path
-        # click_link '編集'
-        visit "/tasks/#{task.id}/edit"
-
-        # 新しい値を入力してキャンセル
+    describe 'タスクの編集をキャンセル' do
+      subject {
+        visit task_edit_path
         fill_in 'title', with: task_after.title
         fill_in 'description', with: task_after.description
-        expect {
-          click_link 'キャンセル'
-        }.not_to(change { Task.count })
-        expect(page).to have_current_path('/')
+        click_link 'キャンセル'
+        page
+      }
+      it { expect { subject }.not_to(change { Task.count }) }
+      it { is_expected.to have_current_path('/') }
 
-        # タスク一覧でタスクが更新されていないことを確認
+      it 'タスク一覧のタスクが更新されていない' do
+        subject
         expect(page).to have_content(task.title)
         expect(page).to have_content(task.description)
+      end
+
+      it 'タスク一覧にキャンセルした内容が反映されてしまっていない' do
+        subject
         expect(page).to have_no_content(task_after.title)
         expect(page).to have_no_content(task_after.description)
       end
     end
+  end
 
-    context 'タスク削除' do
-      it 'タスク削除実行' do
-        visit root_path
-        click_button '削除'
-        expect(page).to have_content('本当によろしいですか？')
-        sleep 1 # 確認ダイアログの表示アニメーションを待つ
+  describe 'タスクの削除' do
+    let!(:task) { FactoryBot.create(:task) }
+    let(:click_delete) {
+      visit root_path
+      click_button '削除'
+      sleep 1 # 確認ダイアログの表示アニメーションを待つ
+    }
+
+    describe 'タスクの削除実行' do
+      subject {
+        click_delete
+        click_button 'はい'
+        page
+      }
+
+      it {
         expect {
-          click_button 'はい'
-          # 下記1行はajax終了後にTask.countをチェックさせる為にexpec{}内に入れてます
-          expect(page).to have_content('タスクが削除されました')
-        }.to change { Task.count }.by(-1)
+          subject
+          sleep 1
+        }.to change { Task.count }.from(1).to(0)
+      }
+
+      it { is_expected.to have_content('タスクが削除されました') }
+
+      it 'タスク一覧から削除されたタスクが消えている' do
+        subject
         expect(page).to have_no_content(task.title)
         expect(page).to have_no_content(task.description)
       end
+    end
 
-      it 'タスク削除キャンセル' do
-        visit root_path
-        click_button '削除'
-        expect(page).to have_content('本当によろしいですか？')
-        sleep 1 # 確認ダイアログの表示アニメーションを待つ
+    describe 'タスク削除のキャンセル' do
+      subject {
+        click_delete
+        click_button 'いいえ'
+        page
+      }
+
+      it {
         expect {
-          click_button 'いいえ'
+          subject
+          sleep 1
         }.not_to(change { Task.count })
+      }
+
+      it 'タスク一覧から削除をキャンセルしたタスクが消えていない' do
+        subject
         expect(page).to have_content(task.title)
         expect(page).to have_content(task.description)
       end
