@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -15,6 +15,7 @@ import ConfirmDialog from "common/ConfirmDialog";
 import FlashMessage from "common/FlashMessage";
 import Box from '@mui/material/Box';
 import { datetime_format } from 'utils/constants';
+import SortForm from "common/SortForm";
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
@@ -80,10 +81,23 @@ const Top = () => {
       });
   };
 
+  // タスク一覧のソート処理
+  const getValueForSort = sortType => task => dayjs(task[sortType] || '2100-01-01'); // 期限が設定されていないものは遥か未来として扱う
+  const handleChangeSort = (sortType, isAsc) => {
+    const f = getValueForSort(sortType);
+    const n = isAsc ? 1 : -1;
+    const sortedTasks = Array.from(tasks).sort((a, b) => (f(a) - f(b)) * n);
+    setTasks(sortedTasks);
+  };
+
   return (
     <BaseLayout>
       <ConfirmDialog ref={confirmDialogRef} />
       <FlashMessage ref={flashMessageRef} />
+
+      <div style={{ padding: '20px 0' }}>
+        <SortForm onChange={handleChangeSort} />
+      </div>
 
       {tasks.map(task=> (
         <TaskCard key={task.id}>
