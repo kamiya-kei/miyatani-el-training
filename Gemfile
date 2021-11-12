@@ -61,6 +61,7 @@ end
 gem 'tzinfo-data', platforms: %i(mingw mswin x64_mingw jruby)
 
 gem 'pry-rails'
+gem 'active_hash'
 
 gem 'graphql'
 gem 'react-rails'
