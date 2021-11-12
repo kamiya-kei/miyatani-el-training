@@ -18,6 +18,7 @@ const TaskPost = () => {
             input:{
               title: "${data.title}"
               description: "${data.description}"
+              deadline: "${data.deadline}"
             }
           ) {
             task {

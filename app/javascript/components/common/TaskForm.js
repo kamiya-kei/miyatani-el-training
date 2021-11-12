@@ -13,8 +13,9 @@ import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
 
 const TaskForm = (props) => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
   const handleAction = data => {
+    console.log(data);
     props.onAction(data);
   };
 
@@ -44,7 +45,7 @@ const TaskForm = (props) => {
             />
           </FormItem>
           <FormItem>
-            <DeadLine register={register} />
+            <DeadLine register={register} setValue={setValue} errors={errors} />
           </FormItem>
         </CardContent>
         <CardActions>
