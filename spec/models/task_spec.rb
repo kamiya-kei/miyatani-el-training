@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Task, type: :model do
-  describe '#create' do
+  describe '#validate' do
     let(:task) { FactoryBot.build(:task, params) }
 
     context '全ての値がセットされているとき' do
