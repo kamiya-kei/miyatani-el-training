@@ -141,9 +141,9 @@ RSpec.describe 'Tasks', type: :system do
 
     let(:tasks) {
       [
-        FactoryBot.build(:task, created_at: '2021-11-01 00:00:00'),
-        FactoryBot.build(:task, created_at: '2021-11-02 00:00:00'),
-        FactoryBot.build(:task, created_at: '2021-11-03 00:00:00')
+        FactoryBot.build(:task, created_at: '2021-11-01 00:00:00', deadline: '2021-11-02 00:00:00'),
+        FactoryBot.build(:task, created_at: '2021-11-02 00:00:00', deadline: '2021-11-01 00:00:00'),
+        FactoryBot.build(:task, created_at: '2021-11-03 00:00:00', deadline: '2021-11-03 00:00:00')
       ]
     }
 
@@ -151,6 +151,24 @@ RSpec.describe 'Tasks', type: :system do
       it '作成日時降順' do
         visit root_path
         page.body.should =~ /#{tasks[2].title}.*#{tasks[1].title}.*#{tasks[0].title}/
+      end
+
+      it '作成日時昇順' do
+        visit root_path
+        click_button '作成日時'
+        page.body.should =~ /#{tasks[0].title}.*#{tasks[1].title}.*#{tasks[2].title}/
+      end
+
+      it '期限降順' do
+        visit root_path
+        click_button '期限'
+        page.body.should =~ /#{tasks[2].title}.*#{tasks[0].title}.*#{tasks[1].title}/
+      end
+
+      it '期限昇順' do
+        visit root_path
+        2.times { click_button '期限' }
+        page.body.should =~ /#{tasks[1].title}.*#{tasks[0].title}.*#{tasks[2].title}/
       end
     end
   end
