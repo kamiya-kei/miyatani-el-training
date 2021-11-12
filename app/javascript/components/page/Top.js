@@ -13,6 +13,9 @@ import BaseLayout from "BaseLayout";
 import TaskCard from "common/TaskCard";
 import ConfirmDialog from "common/ConfirmDialog";
 import FlashMessage from "common/FlashMessage";
+import Box from '@mui/material/Box';
+
+const datetime_format = 'YYYY-MM-DD HH:mm:ss';
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
@@ -28,6 +31,7 @@ const Top = () => {
             id
             title
             description
+            deadline
             createdAt
           }
         }
@@ -86,7 +90,18 @@ const Top = () => {
         <TaskCard key={task.id}>
           <CardHeader
             title={task.title}
-            subheader={dayjs(task.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+            subheader={
+              <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div>
+                  作成日時:
+                  {dayjs(task.createdAt).format(datetime_format)}
+                </div>
+                <div>
+                  期限:
+                  {task.deadline ? dayjs(task.deadline).format(datetime_format) : '--'}
+                </div>
+              </Box>
+            }
           />
           <CardContent>{task.description}</CardContent>
           <CardActions>
