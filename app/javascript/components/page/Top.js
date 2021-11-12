@@ -14,8 +14,7 @@ import TaskCard from "common/TaskCard";
 import ConfirmDialog from "common/ConfirmDialog";
 import FlashMessage from "common/FlashMessage";
 import Box from '@mui/material/Box';
-
-const datetime_format = 'YYYY-MM-DD HH:mm:ss';
+import { datetime_format } from 'utils/constants';
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);

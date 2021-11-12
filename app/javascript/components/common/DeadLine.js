@@ -1,21 +1,20 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import TextField from '@mui/material/TextField';
 import DateAdapter from '@mui/lab/AdapterDayjs';
+import dayjs from 'dayjs';
+import { datetime_format } from 'utils/constants';
 
 const DeadLine = (props) => {
   const [value, setValue] = useState(new Date(props.defaultValue || ''));
 
-  const inputRef = useRef();
-
   const handleChange = (newValue) => {
     setValue(newValue);
-    const inputValue = inputRef.current.value;
-    props.setValue('deadline', inputValue);
+    const newValueString = dayjs(newValue.$d).format(datetime_format);
+    props.setValue('deadline', newValueString);
   };
-
 
   return (
     <LocalizationProvider dateAdapter={DateAdapter}>
@@ -38,7 +37,6 @@ const DeadLine = (props) => {
             helperText={props.errors.deadline?.message}
           />
         )}
-        inputRef={inputRef}
       />
     </LocalizationProvider>
   );
