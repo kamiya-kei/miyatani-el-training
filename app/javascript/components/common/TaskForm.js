@@ -9,6 +9,7 @@ import TextField from '@mui/material/TextField';
 import TaskCard from "common/TaskCard";
 import FormItem from "common/FormItem";
 import DeadLine from "common/DeadLine";
+import DoneForm from "common/DoneForm";
 import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
 
@@ -48,6 +49,12 @@ const TaskForm = (props) => {
             <DeadLine
               register={register} setValue={setValue} errors={errors}
               defaultValue={props.task.deadline}
+            />
+          </FormItem>
+          <FormItem>
+            <DoneForm
+              setValue={setValue}
+              defaultValue={props.task.done?.id || '-1'}
             />
           </FormItem>
         </CardContent>
