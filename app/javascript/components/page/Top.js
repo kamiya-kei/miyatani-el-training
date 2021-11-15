@@ -1,23 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
-import { useLocation } from "react-router-dom";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
+import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
-import BaseLayout from "BaseLayout";
-import TaskCard from "common/TaskCard";
-import ConfirmDialog from "common/ConfirmDialog";
-import FlashMessage from "common/FlashMessage";
-import Box from '@mui/material/Box';
+import BaseLayout from 'BaseLayout';
+import TaskCard from 'common/TaskCard';
+import ConfirmDialog from 'common/ConfirmDialog';
+import FlashMessage from 'common/FlashMessage';
+import SortForm from 'common/SortForm';
+import SearchForm from 'common/SearchForm';
 import { DATETIME_FORMAT } from 'utils/constants';
-import SortForm from "common/SortForm";
-import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
 
 const DoneChip = (props) => {
   const COLORS = {
@@ -33,6 +33,9 @@ const DoneChip = (props) => {
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
+  const [sortType, setSortType] = useState('createdAt');
+  const [isAsc, setIsAsc] = useState(false);
+
   const { state } = useLocation();
   const confirmDialogRef = useRef();
   const flashMessageRef = useRef();
@@ -106,6 +109,12 @@ const Top = () => {
     const n = isAsc ? 1 : -1;
     const sortedTasks = Array.from(tasks).sort((a, b) => (f(a) - f(b)) * n);
     setTasks(sortedTasks);
+    setSortType(sortType);
+    setIsAsc(isAsc);
+  };
+
+  const handleSearch = (tasks) => {
+    setTasks(tasks);
   };
 
   return (
@@ -113,9 +122,14 @@ const Top = () => {
       <ConfirmDialog ref={confirmDialogRef} />
       <FlashMessage ref={flashMessageRef} />
 
-      <div style={{ padding: '20px 0' }}>
-        <SortForm onChange={handleChangeSort} />
-      </div>
+      <Stack spacing={2} style={{ padding: '20px 0' }}>
+        <div>
+          <SearchForm sortType={sortType} isAsc={isAsc} onSearch={handleSearch} />
+        </div>
+        <div>
+          <SortForm sortType={sortType} isAsc={isAsc} onChange={handleChangeSort} />
+        </div>
+      </Stack>
 
       {tasks.map(task=> (
         <TaskCard key={task.id}>
