@@ -21,5 +21,10 @@ RSpec.describe Task, type: :model do
         expect(task.errors.full_messages).to include("Title can't be blank")
       }
     end
+
+    context 'タスクの期限が空のとき' do
+      let(:params) { { deadline: '' } }
+      it { expect(task).to be_valid }
+    end
   end
 end

@@ -181,4 +181,57 @@ RSpec.describe 'Tasks', type: :system do
       end
     end
   end
+
+  describe 'タスク一覧の並び順' do
+    let!(:tasks) {
+      [
+        FactoryBot.create(:task, created_at: '2021-11-01 00:00:00', deadline: '2021-11-02 00:00:00'),
+        FactoryBot.create(:task, created_at: '2021-11-02 00:00:00', deadline: '2021-11-01 00:00:00'),
+        FactoryBot.create(:task, created_at: '2021-11-03 00:00:00', deadline: '2021-11-03 00:00:00')
+      ]
+    }
+
+    context 'ページ表示直後' do
+      subject {
+        visit root_path
+        page.body
+      }
+      it '作成日時降順に並んでいる' do
+        expect(subject).to match /#{tasks[2].title}.*#{tasks[1].title}.*#{tasks[0].title}/
+      end
+    end
+
+    context '作成日時の並べ替えボタンをクリックしたとき' do
+      subject {
+        visit root_path
+        click_button '作成日時'
+        page.body
+      }
+      it '作成日時昇順に並びが変わる' do
+        expect(subject).to match /#{tasks[0].title}.*#{tasks[1].title}.*#{tasks[2].title}/
+      end
+    end
+
+    context '期限の並べ替えボタンをクリックしたとき' do
+      subject {
+        visit root_path
+        click_button '期限'
+        page.body
+      }
+      it '期限降順に並びが変わる' do
+        expect(subject).to match /#{tasks[2].title}.*#{tasks[0].title}.*#{tasks[1].title}/
+      end
+    end
+
+    context '期限の並べ替えボタンを2回クリックしたとき' do
+      subject {
+        visit root_path
+        2.times { click_button '期限' }
+        page.body
+      }
+      it '期限昇順に並びが変わる' do
+        expect(subject).to match /#{tasks[1].title}.*#{tasks[0].title}.*#{tasks[2].title}/
+      end
+    end
+  end
 end

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -13,6 +13,9 @@ import BaseLayout from "BaseLayout";
 import TaskCard from "common/TaskCard";
 import ConfirmDialog from "common/ConfirmDialog";
 import FlashMessage from "common/FlashMessage";
+import Box from '@mui/material/Box';
+import { DATETIME_FORMAT } from 'utils/constants';
+import SortForm from "common/SortForm";
 
 const Top = () => {
   const [tasks, setTasks] = useState([]);
@@ -28,6 +31,7 @@ const Top = () => {
             id
             title
             description
+            deadline
             createdAt
           }
         }
@@ -77,16 +81,40 @@ const Top = () => {
       });
   };
 
+  // タスク一覧のソート処理
+  const getValueForSort = sortType => task => dayjs(task[sortType] || '2100-01-01'); // 期限が設定されていないものは遥か未来として扱う
+  const handleChangeSort = (sortType, isAsc) => {
+    const f = getValueForSort(sortType);
+    const n = isAsc ? 1 : -1;
+    const sortedTasks = Array.from(tasks).sort((a, b) => (f(a) - f(b)) * n);
+    setTasks(sortedTasks);
+  };
+
   return (
     <BaseLayout>
       <ConfirmDialog ref={confirmDialogRef} />
       <FlashMessage ref={flashMessageRef} />
 
+      <div style={{ padding: '20px 0' }}>
+        <SortForm onChange={handleChangeSort} />
+      </div>
+
       {tasks.map(task=> (
         <TaskCard key={task.id}>
           <CardHeader
             title={task.title}
-            subheader={dayjs(task.createdAt).format('YYYY-MM-DD HH:mm:ss')}
+            subheader={
+              <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div>
+                  作成日時:
+                  {dayjs(task.createdAt).format(DATETIME_FORMAT)}
+                </div>
+                <div>
+                  期限:
+                  {task.deadline ? dayjs(task.deadline).format(DATETIME_FORMAT) : '--'}
+                </div>
+              </Box>
+            }
           />
           <CardContent>{task.description}</CardContent>
           <CardActions>

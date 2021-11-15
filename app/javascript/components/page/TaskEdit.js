@@ -21,6 +21,7 @@ const TaskEdit = () => {
             id
             title
             description
+            deadline
             createdAt
           }
         }
@@ -43,6 +44,7 @@ const TaskEdit = () => {
               id: ${params.id}
               title: "${data.title}"
               description: "${data.description}"
+              deadline: "${data.deadline}"
             }
           ){
             task {

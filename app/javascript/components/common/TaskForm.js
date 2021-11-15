@@ -8,12 +8,14 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import TaskCard from "common/TaskCard";
 import FormItem from "common/FormItem";
+import DeadLine from "common/DeadLine";
 import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
 
 const TaskForm = (props) => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
   const handleAction = data => {
+    console.log(data);
     props.onAction(data);
   };
 
@@ -40,6 +42,12 @@ const TaskForm = (props) => {
               label="タスクの内容"
               defaultValue={props.task.description || ''}
               {...register('description')}
+            />
+          </FormItem>
+          <FormItem>
+            <DeadLine
+              register={register} setValue={setValue} errors={errors}
+              defaultValue={props.task.deadline}
             />
           </FormItem>
         </CardContent>
