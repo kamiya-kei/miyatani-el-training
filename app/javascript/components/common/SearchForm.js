@@ -8,7 +8,10 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
-
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
@@ -28,9 +31,10 @@ const SearchForm = (props) => {
         {
           tasks(
             word: "${formData.get('word')}",
-            doneIds: [${formData.getAll('done_ids[]')}]
-            sortType: "${props.sortType}"
-            isAsc: ${props.isAsc}
+            doneIds: [${formData.getAll('done_ids[]')}],
+            sortType: "${props.sortType}",
+            isAsc: ${props.isAsc},
+            target: "${formData.get('target')}"
           ) {
             id
             title
@@ -72,11 +76,20 @@ const SearchForm = (props) => {
       </Paper>
 
       <FormControl component="fieldset">
-        <FormGroup row aria-label="gender" name="row-radio-buttons-group">
+        <RadioGroup row aria-label="search-target" name="target" defaultValue="all">
+          <FormLabel component="legend" sx={{display: 'flex', alignItems: 'center' }}>検索対象：</FormLabel>
+          <FormControlLabel value="all" control={<Radio size="small" />} label="両方" />
+          <FormControlLabel value="title" control={<Radio size="small" />} label="タイトル" />
+          <FormControlLabel value="description" control={<Radio size="small" />} label="内容" />
+        </RadioGroup>
+      </FormControl>
+
+      <FormControl component="fieldset">
+        <FormGroup row aria-label="done_ids">
           <FormLabel component="legend" sx={{display: 'flex', alignItems: 'center' }}>ステータス：</FormLabel>
-          <FormControlLabel control={<Checkbox name="done_ids[]" value="-1" defaultChecked />} label="未着手" />
-          <FormControlLabel control={<Checkbox name="done_ids[]" value="0" defaultChecked />} label="着手" />
-          <FormControlLabel control={<Checkbox names="done_ids[]" value="1" defaultChecked />} label="完了" />
+          <FormControlLabel control={<Checkbox name="done_ids[]" value="-1" defaultChecked size="small" />} label="未着手" />
+          <FormControlLabel control={<Checkbox name="done_ids[]" value="0" defaultChecked size="small" />} label="着手" />
+          <FormControlLabel control={<Checkbox name="done_ids[]" value="1" defaultChecked size="small" />} label="完了" />
         </FormGroup>
       </FormControl>
     </Paper>
