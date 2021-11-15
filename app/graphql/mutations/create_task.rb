@@ -9,8 +9,7 @@ module Mutations
 
     def resolve(**args)
       task = Task.create!(
-        args.except(:done)
-            .merge(done_id: args[:done])
+        args.transform_keys(done: :done_id)
       )
       {
         task: task

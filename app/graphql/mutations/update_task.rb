@@ -11,8 +11,8 @@ module Mutations
     def resolve(**args)
       task = Task.find(args[:id])
       task.update!(
-        args.except(:id, :done)
-            .merge(done_id: args[:done])
+        args.except(:id)
+            .transform_keys(done: :done_id)
       )
       {
         task: task
