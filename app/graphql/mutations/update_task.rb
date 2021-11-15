@@ -6,10 +6,14 @@ module Mutations
     argument :title,       String, required: false
     argument :description, String, required: false
     argument :deadline,    String, required: false
+    argument :done,        ID,     required: false
 
     def resolve(**args)
       task = Task.find(args[:id])
-      task.update!(args.except(:id))
+      task.update!(
+        args.except(:id, :done)
+            .merge(done_id: args[:done])
+      )
       {
         task: task
       }

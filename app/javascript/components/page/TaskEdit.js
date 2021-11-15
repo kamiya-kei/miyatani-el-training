@@ -22,6 +22,9 @@ const TaskEdit = () => {
             title
             description
             deadline
+            done {
+              id
+            }
             createdAt
           }
         }
@@ -45,6 +48,7 @@ const TaskEdit = () => {
               title: "${data.title}"
               description: "${data.description}"
               deadline: "${data.deadline}"
+              done: "${data.done_id}"
             }
           ){
             task {
