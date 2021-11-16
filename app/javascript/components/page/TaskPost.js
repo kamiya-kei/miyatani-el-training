@@ -20,6 +20,7 @@ const TaskPost = () => {
               description: "${data.description}"
               deadline: "${data.deadline}"
               doneId: "${data.done_id}"
+              priorityNumber: ${data.priorityNumber}
             }
           ) {
             task {

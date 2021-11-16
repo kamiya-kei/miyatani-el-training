@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
@@ -8,6 +8,10 @@ import Select from '@mui/material/Select';
 
 const PriorityForm = (props) => {
   const [priority, setPriority] = useState(props.defaultValue);
+
+  useEffect(() => {
+    props.setValue('priorityNumber', priority);
+  }, []);
 
   const handleChange = (event) => {
     setPriority(event.target.value);
