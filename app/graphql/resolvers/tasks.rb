@@ -10,7 +10,7 @@ module Resolvers
 
     def resolve(**args)
       if args.empty?
-        Task.all.order('created_at': 'DESC') 
+        Task.all.order(created_at: 'DESC')
       else
         Task.search(**args.slice(:word, :target, :done_ids, :sort_type, :is_asc))
       end

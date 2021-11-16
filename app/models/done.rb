@@ -5,5 +5,5 @@ class Done < ActiveHash::Base
     { id:  1, text: '完了' }
   ]
   include ActiveHash::Associations
-  has_many :tasks
+  has_many :tasks, dependent: :restrict_with_error
 end
