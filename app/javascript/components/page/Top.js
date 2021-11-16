@@ -36,6 +36,7 @@ const Top = () => {
   const [tasks, setTasks] = useState([]);
   const [sortType, setSortType] = useState('createdAt');
   const [isAsc, setIsAsc] = useState(false);
+  const [page, setPage] = useState(1);
 
   const { state } = useLocation();
   const confirmDialogRef = useRef();
@@ -45,7 +46,7 @@ const Top = () => {
     axios.post('/graphql', {
       query: `
         {
-          tasks {
+          tasks(page: ${page}) {
             id
             title
             description
