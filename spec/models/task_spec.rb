@@ -38,6 +38,11 @@ RSpec.describe Task, type: :model do
         let(:params) { { done_id: 2 } }
         it { is_expected.to include('Done is not included in the list') }
       end
+
+      context 'タスクのステータスが0,1,2以外の時' do
+        let(:params) { { priority_number: 3 } }
+        it { is_expected.to include('Priority number is not included in the list') }
+      end
     end
   end
 
