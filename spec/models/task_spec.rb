@@ -40,4 +40,56 @@ RSpec.describe Task, type: :model do
       end
     end
   end
+
+  describe '検索' do
+    subject {
+      create_tasks
+      Task.
+        search(word: '', target: 'all', done_ids: [-1, 0, 1], sort_type: 'created_at', is_asc: false, **params).
+        pluck(:id).
+        to_set
+    }
+    let(:create_tasks) {
+      FactoryBot.create(:task, id: 0, title: 'AAAAA', description: 'XXXXX', done_id: -1)
+      FactoryBot.create(:task, id: 1, title: 'BBBBB', description: 'XXXXX', done_id: 0)
+      FactoryBot.create(:task, id: 2, title: 'CCCCC', description: 'XXAAX', done_id: 1)
+      FactoryBot.create(:task, id: 3, title: 'AABCC', description: 'XXXXX', done_id: 1)
+      FactoryBot.create(:task, id: 4, title: 'CCBAA', description: 'XXXXX', done_id: -1)
+    }
+
+    describe 'タイトル・内容両方のキーワード検索' do
+      let(:params) { { word: 'AA', target: 'all' } }
+      it { is_expected.to eq Set[0, 2, 3, 4] }
+    end
+
+    describe 'タイトルのキーワード検索' do
+      let(:params) { { word: 'AA', target: 'title' } }
+      it { is_expected.to eq Set[0, 3, 4] }
+    end
+
+    describe '内容のキーワード検索' do
+      let(:params) { { word: 'AA', target: 'description' } }
+      it { is_expected.to eq Set[2] }
+    end
+
+    describe 'ステータス未着手の検索' do
+      let(:params) { { done_ids: [-1] } }
+      it { is_expected.to eq Set[0, 4] }
+    end
+
+    describe 'ステータス着手の検索' do
+      let(:params) { { done_ids: [0] } }
+      it { is_expected.to eq Set[1] }
+    end
+
+    describe 'ステータス完了の検索' do
+      let(:params) { { done_ids: [1] } }
+      it { is_expected.to eq Set[2, 3] }
+    end
+
+    describe '複数のステータスの検索' do
+      let(:params) { { done_ids: [-1, 0] } }
+      it { is_expected.to eq Set[0, 1, 4] }
+    end
+  end
 end
