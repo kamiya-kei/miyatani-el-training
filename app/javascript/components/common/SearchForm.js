@@ -70,7 +70,7 @@ const SearchForm = (props) => {
           placeholder="検索ワード"
           inputProps={{ 'aria-label': 'search google maps' }}
         />
-        <IconButton type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSubmit}>
+        <IconButton id="search" type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSubmit}>
           <SearchIcon />
         </IconButton>
       </Paper>
