@@ -36,9 +36,15 @@ const SortForm = (props) => {
             <ArrowToggleIcon isAsc={props.isAsc} />
           }
         </ToggleButton>
-        <ToggleButton value="deadline" sx={{ width: '80px' }}>
+        <ToggleButton value="deadline" sx={{ width: '100px' }}>
           期限
           {props.sortType === 'deadline' &&
+            <ArrowToggleIcon isAsc={props.isAsc} />
+          }
+        </ToggleButton>
+        <ToggleButton value="priorityNumber" sx={{ width: '100px' }}>
+          優先度
+          {props.sortType === 'priorityNumber' &&
             <ArrowToggleIcon isAsc={props.isAsc} />
           }
         </ToggleButton>

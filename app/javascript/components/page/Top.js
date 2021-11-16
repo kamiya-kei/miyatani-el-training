@@ -105,7 +105,11 @@ const Top = () => {
   };
 
   // タスク一覧のソート処理
-  const getValueForSort = sortType => task => dayjs(task[sortType] || '2100-01-01'); // 期限が設定されていないものは遥か未来として扱う
+  const getValueForSort = (sortType) => {
+    return sortType == 'priorityNumber' ? 
+      (task) => task.priorityNumber :
+      (task) => dayjs(task[sortType] || '2100-01-01');// 期限が設定されていないものは遥か未来として扱う
+  };
   const handleChangeSort = (sortType, isAsc) => {
     const f = getValueForSort(sortType);
     const n = isAsc ? 1 : -1;
