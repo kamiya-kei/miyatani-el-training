@@ -4,6 +4,7 @@ class Task < ApplicationRecord
 
   validates :title, presence: true
   validates :done_id, inclusion: { in: Done.pluck(:id) }
+  validates :priority_number, inclusion: { in: [0, 1, 2] }
 
   def self.search(word:, target:, done_ids:, sort_type:, is_asc:)
     sort_key = sort_type.underscore # スネークケースに変換
