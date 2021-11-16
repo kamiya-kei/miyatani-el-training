@@ -17,6 +17,7 @@ import ConfirmDialog from 'common/ConfirmDialog';
 import FlashMessage from 'common/FlashMessage';
 import SortForm from 'common/SortForm';
 import SearchForm from 'common/SearchForm';
+import Priority from 'common/Priority';
 import { DATETIME_FORMAT } from 'utils/constants';
 
 const DoneChip = (props) => {
@@ -53,6 +54,7 @@ const Top = () => {
               id
               text
             }
+            priorityNumber
             createdAt
           }
         }
@@ -136,7 +138,10 @@ const Top = () => {
           <CardHeader
             title={
               <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div>{task.title}</div>
+                <div>
+                  <Priority priority={task.priorityNumber} />
+                  {task.title}
+                </div>
                 <div>
                   <DoneChip done={task.done} />
                 </div>
