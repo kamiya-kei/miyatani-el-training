@@ -234,4 +234,49 @@ RSpec.describe 'Tasks', type: :system do
       end
     end
   end
+
+  describe 'タスクの検索' do
+    let!(:tasks) {
+      [
+        FactoryBot.create(:task, title: 'AAAAA', description: 'XXXXX', done_id: -1),
+        FactoryBot.create(:task, title: 'BBBBB', description: 'XXXXX', done_id: 0),
+        FactoryBot.create(:task, title: 'CCCCC', description: 'XXAAX', done_id: 1),
+        FactoryBot.create(:task, title: 'AABCC', description: 'XXXXX', done_id: 1),
+        FactoryBot.create(:task, title: 'CCBAA', description: 'XXXXX', done_id: -1)
+      ]
+    }
+
+    describe 'タイトルのキーワード検索＆ステータス未着手で検索' do
+      subject {
+        visit root_path
+        fill_in 'word', with: 'AA'
+        find('label', exact_text: 'タイトル').click
+        find('label', exact_text: '着手').click # チェック解除
+        find('label', exact_text: '完了').click # チェック解除
+        click_button 'search'
+        page
+      }
+      it { is_expected.to have_content(tasks[0].title) }
+      it { is_expected.to have_no_content(tasks[1].title) }
+      it { is_expected.to have_no_content(tasks[2].title) }
+      it { is_expected.to have_no_content(tasks[3].title) }
+      it { is_expected.to have_content(tasks[4].title) }
+    end
+
+    describe '内容のキーワード検索＆ステータス着手・完了で検索' do
+      subject {
+        visit root_path
+        fill_in 'word', with: 'XXX'
+        find('label', exact_text: '内容').click
+        find('label', exact_text: '未着手').click # チェック解除
+        click_button 'search'
+        page
+      }
+      it { is_expected.to have_no_content(tasks[0].title) }
+      it { is_expected.to have_content(tasks[1].title) }
+      it { is_expected.to have_no_content(tasks[2].title) }
+      it { is_expected.to have_content(tasks[3].title) }
+      it { is_expected.to have_no_content(tasks[4].title) }
+    end
+  end
 end

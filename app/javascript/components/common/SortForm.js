@@ -11,19 +11,13 @@ const ArrowToggleIcon = (props) => (
 );
 
 const SortForm = (props) => {
-  const [sortType, setSortType] = useState('createdAt');
-  const [isAsc, setIsAsc] = useState(false);
-
   const handleChange = (event, newValue) => {
     if (newValue) {
       // 並び替え項目を切り替えて、降順にリセット
-      setSortType(newValue);
-      setIsAsc(false);
       props.onChange(newValue, false);
     } else {
       // 昇順・降順を切り替え
-      setIsAsc(!isAsc);
-      props.onChange(sortType, !isAsc);
+      props.onChange(props.sortType, !props.isAsc);
     }
   };
 
@@ -32,20 +26,20 @@ const SortForm = (props) => {
       並び順：
       <ToggleButtonGroup
         color="primary"
-        value={sortType}
+        value={props.sortType}
         exclusive
         onChange={handleChange}
       >
         <ToggleButton value="createdAt" sx={{ width: '110px' }}>
           作成日時
-          {sortType === 'createdAt' &&
-            <ArrowToggleIcon isAsc={isAsc} />
+          {props.sortType === 'createdAt' &&
+            <ArrowToggleIcon isAsc={props.isAsc} />
           }
         </ToggleButton>
         <ToggleButton value="deadline" sx={{ width: '80px' }}>
           期限
-          {sortType === 'deadline' &&
-            <ArrowToggleIcon isAsc={isAsc} />
+          {props.sortType === 'deadline' &&
+            <ArrowToggleIcon isAsc={props.isAsc} />
           }
         </ToggleButton>
       </ToggleButtonGroup>
