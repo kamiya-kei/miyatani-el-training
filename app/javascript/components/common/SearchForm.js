@@ -44,7 +44,13 @@ const SearchForm = (props) => {
           name="word"
           sx={{ ml: 1, flex: 1 }}
           placeholder="検索ワード"
-          inputProps={{ 'aria-label': 'search google maps' }}
+          inputProps={{ 'aria-label': 'search word' }}
+          onKeyDown={(event) => {
+            // フォーム内でEnter押下時にページ遷移しないようにする
+            if (event.code !== 'Enter') { return; }
+            event.preventDefault();
+            handleSubmit();
+          }}
         />
         <IconButton id="search" type="button" sx={{ p: '10px' }} aria-label="search" onClick={handleSubmit}>
           <SearchIcon />
