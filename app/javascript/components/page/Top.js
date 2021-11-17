@@ -20,6 +20,8 @@ import Priority from 'common/Priority';
 import DoneChip from 'common/DoneChip';
 import TasksPagination from 'common/TasksPagination';
 import { DATETIME_FORMAT } from 'utils/constants';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const DEFAULT_SEARCH_PARAMETERS = {
   word: '',
@@ -34,6 +36,7 @@ const Top = () => {
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMETERS);
   const [tasks, setTasks] = useState([]);  
   const [maxPage, setMaxPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { state } = useLocation();
   const confirmDialogRef = useRef();
@@ -44,6 +47,7 @@ const Top = () => {
     const { page, word, target, doneIds, sortType, isAsc } = allParams;
     setSearchParams(allParams);
 
+    setIsLoading(true);
     axios.post('/graphql', {
       query: `
         {
@@ -80,6 +84,10 @@ const Top = () => {
       .catch(error => {
         alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
         console.error(error);
+      })
+      .finally(() => {
+        // loadingが終わったことを認識できるように少しだけloadingを非表示にするまで遅延
+        setTimeout(() => setIsLoading(false), 100);
       });
   };
 
@@ -145,8 +153,11 @@ const Top = () => {
         <div>
           <SearchForm onSearch={handleSearch} />
         </div>
-        <div>
+        <div style={{textAlign: 'right'}}>
           <SortForm sortType={searchParams.sortType} isAsc={searchParams.isAsc} onChange={handleChangeSort} />
+        </div>
+        <div>
+          <TasksPagination page={searchParams.page} maxPage={maxPage} onClick={handleClickPagination} />
         </div>
       </Stack>
 
@@ -190,6 +201,13 @@ const Top = () => {
       <div style={{ padding: '20px 0' }}>
         <TasksPagination page={searchParams.page} maxPage={maxPage} onClick={handleClickPagination} />
       </div>
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </BaseLayout>
   );
 };
