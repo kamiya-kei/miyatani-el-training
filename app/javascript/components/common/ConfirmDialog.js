@@ -1,5 +1,4 @@
-import React, { forwardRef, useState, useImperativeHandle } from "react";
-import PropTypes from "prop-types";
+import React, { forwardRef, useState, useImperativeHandle } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -11,30 +10,32 @@ import Slide from '@mui/material/Slide';
 const Transition = forwardRef((props, ref) => {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+Transition.displayName = 'Transition';
 
 const ConfirmDialog = forwardRef((props, ref) => {
   const [open, setOpen] = useState(false);
 
-  const [handleAgree, setHandleAgree] = useState(()=>{});
-  const [handleDisagree, setHandleDisagree] = useState(()=>{});
+  const [handleAgree, setHandleAgree] = useState(() => {});
+  const [handleDisagree, setHandleDisagree] = useState(() => {});
   const resetHandle = () => {
-    setHandleAgree(()=>{});
-    setHandleDisagree(()=>{});
+    setHandleAgree(() => {});
+    setHandleDisagree(() => {});
     setOpen(false);
   };
 
   useImperativeHandle(ref, () => ({
-    confirm: () => new Promise((resolve, reject) => {
-      setHandleAgree(() => () => {
-        resetHandle();
-        resolve(true);
-      });
-      setHandleDisagree(() => () => {
-        resetHandle();
-        resolve(false);
-      });
-      setOpen(true);
-    }),
+    confirm: () =>
+      new Promise((resolve) => {
+        setHandleAgree(() => () => {
+          resetHandle();
+          resolve(true);
+        });
+        setHandleDisagree(() => () => {
+          resetHandle();
+          resolve(false);
+        });
+        setOpen(true);
+      }),
   }));
 
   return (
@@ -60,5 +61,6 @@ const ConfirmDialog = forwardRef((props, ref) => {
     </div>
   );
 });
+ConfirmDialog.displayName = 'ConfirmDialog';
 
 export default ConfirmDialog;

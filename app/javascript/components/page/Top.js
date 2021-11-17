@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import CardHeader from '@mui/material/CardHeader';
@@ -34,7 +33,7 @@ const DEFAULT_SEARCH_PARAMETERS = {
 
 const Top = () => {
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMETERS);
-  const [tasks, setTasks] = useState([]);  
+  const [tasks, setTasks] = useState([]);
   const [maxPage, setMaxPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,14 +41,15 @@ const Top = () => {
   const confirmDialogRef = useRef();
   const flashMessageRef = useRef();
 
-  const getTasks = (newParams={}) => {
+  const getTasks = (newParams = {}) => {
     const allParams = { ...searchParams, ...newParams }; // 新しいパラメータを上書き
     const { page, word, target, doneIds, sortType, isAsc } = allParams;
     setSearchParams(allParams);
 
     setIsLoading(true);
-    axios.post('/graphql', {
-      query: `
+    axios
+      .post('/graphql', {
+        query: `
         {
           tasks(
             page: ${page},
@@ -75,14 +75,17 @@ const Top = () => {
             maxPage
           }
         }
-      `})
-      .then(res => {
+      `,
+      })
+      .then((res) => {
         const result = res.data.data.tasks;
         setTasks(result.tasks);
         setMaxPage(result.maxPage);
       })
-      .catch(error => {
-        alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
+      .catch((error) => {
+        alert(
+          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+        );
         console.error(error);
       })
       .finally(() => {
@@ -96,17 +99,22 @@ const Top = () => {
   }, []);
 
   useEffect(() => {
-    if (!state) { return; }
+    if (!state) {
+      return;
+    }
     // タスク作成・編集画面から戻ってきた時にフラッシュメッセージを表示する
     flashMessageRef.current.showMessage(state.message);
   }, [state]);
 
   const handleDelete = async (id) => {
     const is_agree = await confirmDialogRef.current.confirm();
-    if (!is_agree) { return; }
+    if (!is_agree) {
+      return;
+    }
 
-    axios.post('/graphql', {
-      query: `
+    axios
+      .post('/graphql', {
+        query: `
         mutation {
           deleteTask(
             input:{
@@ -118,30 +126,33 @@ const Top = () => {
             }
           }
         }
-      `})
-      .then(res => {
+      `,
+      })
+      .then(() => {
         // 削除後、タスク一覧のデータを再取得して更新
         getTasks();
         // フラッシュメッセージ表示
         flashMessageRef.current.showMessage('タスクが削除されました');
       })
-      .catch(error => {
-        alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
+      .catch((error) => {
+        alert(
+          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+        );
         console.error(error);
       });
   };
 
   // タスク一覧のソート処理
   const handleChangeSort = (sortType, isAsc) => {
-    getTasks({sortType, isAsc, page: 1});
+    getTasks({ sortType, isAsc, page: 1 });
   };
 
-  const handleSearch = ({word, target, doneIds}) => {
-    getTasks({word, target, doneIds, page: 1});
+  const handleSearch = ({ word, target, doneIds }) => {
+    getTasks({ word, target, doneIds, page: 1 });
   };
 
   const handleClickPagination = (page) => {
-    getTasks({page});
+    getTasks({ page });
   };
 
   return (
@@ -153,16 +164,25 @@ const Top = () => {
         <div>
           <SearchForm onSearch={handleSearch} />
         </div>
-        <div style={{textAlign: 'right'}}>
-          <SortForm sortType={searchParams.sortType} isAsc={searchParams.isAsc} onChange={handleChangeSort} />
+        <div style={{ textAlign: 'right' }}>
+          <SortForm
+            sortType={searchParams.sortType}
+            isAsc={searchParams.isAsc}
+            onChange={handleChangeSort}
+          />
         </div>
         <div>
-          <TasksPagination page={searchParams.page} maxPage={maxPage} onClick={handleClickPagination} />
+          <TasksPagination
+            page={searchParams.page}
+            maxPage={maxPage}
+            onClick={handleClickPagination}
+          />
         </div>
       </Stack>
 
-      {tasks.map(task=> (
-        <TaskCard key={task.id} className="task-card">{/* .task-card: rspec用 */}
+      {tasks.map((task) => (
+        <TaskCard key={task.id} className="task-card">
+          {/* .task-card: rspec用 */}
           <CardHeader
             title={
               <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -183,7 +203,9 @@ const Top = () => {
                 </div>
                 <div>
                   期限:
-                  {task.deadline ? dayjs(task.deadline).format(DATETIME_FORMAT) : '--'}
+                  {task.deadline
+                    ? dayjs(task.deadline).format(DATETIME_FORMAT)
+                    : '--'}
                 </div>
               </Box>
             }
@@ -191,15 +213,36 @@ const Top = () => {
           <CardContent>{task.description}</CardContent>
           <CardActions>
             <Stack spacing={2} direction="row">
-              <Button component={Link} to={`/tasks/${task.id}/edit`} variant="contained" size="small" color="primary">編集</Button>
-              <Button variant="contained" size="small" color="secondary" onClick={()=>{handleDelete(task.id)}}>削除</Button>
+              <Button
+                component={Link}
+                to={`/tasks/${task.id}/edit`}
+                variant="contained"
+                size="small"
+                color="primary"
+              >
+                編集
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                color="secondary"
+                onClick={() => {
+                  handleDelete(task.id);
+                }}
+              >
+                削除
+              </Button>
             </Stack>
           </CardActions>
         </TaskCard>
       ))}
 
       <div style={{ padding: '20px 0' }}>
-        <TasksPagination page={searchParams.page} maxPage={maxPage} onClick={handleClickPagination} />
+        <TasksPagination
+          page={searchParams.page}
+          maxPage={maxPage}
+          onClick={handleClickPagination}
+        />
       </div>
 
       <Backdrop

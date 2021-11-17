@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -33,4 +33,9 @@ const DoneForm = (props) => {
   );
 };
 
-export default DoneForm
+DoneForm.propTypes = {
+  defaultValue: PropTypes.string,
+  setValue: PropTypes.func,
+};
+
+export default DoneForm;

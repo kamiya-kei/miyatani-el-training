@@ -1,21 +1,20 @@
-import React, { useState, useEffect, createRef } from "react";
-import PropTypes from "prop-types";
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useParams } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 import axios from 'module/axios_with_csrf';
-import BaseLayout from "BaseLayout";
-import TaskForm from "common/TaskForm";
+import BaseLayout from 'BaseLayout';
+import TaskForm from 'common/TaskForm';
 
 const TaskEdit = () => {
   const navigate = useNavigate();
   const params = useParams();
 
   const [task, setTask] = React.useState({});
-  const formRef = createRef();
 
   useEffect(() => {
-    axios.post('/graphql', {
-      query: `
+    axios
+      .post('/graphql', {
+        query: `
         {
           task(id: ${params.id}) {
             id
@@ -29,19 +28,23 @@ const TaskEdit = () => {
             createdAt
           }
         }
-      `})
-      .then(res => {
+      `,
+      })
+      .then((res) => {
         setTask(res.data.data.task);
       })
-      .catch(error => {
-        alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
+      .catch((error) => {
+        alert(
+          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+        );
         console.error(error);
       });
   }, []);
 
   const handleEdit = (data) => {
-    axios.post('/graphql', {
-      query: `
+    axios
+      .post('/graphql', {
+        query: `
         mutation {
           updateTask(
             input:{
@@ -63,21 +66,28 @@ const TaskEdit = () => {
         }
       `,
       })
-      .then(res => {
+      .then((res) => {
         console.log(res);
-        navigate('/', {state: {message: 'タスクを更新しました'}});
+        navigate('/', { state: { message: 'タスクを更新しました' } });
       })
-      .catch(error => {
-        alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
+      .catch((error) => {
+        alert(
+          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+        );
         console.error(error);
       });
   };
 
   return (
     <BaseLayout>
-      {task.id &&
-        <TaskForm title="タスク編集" task={task} buttonText="更新" onAction={handleEdit} />
-      }
+      {task.id && (
+        <TaskForm
+          title="タスク編集"
+          task={task}
+          buttonText="更新"
+          onAction={handleEdit}
+        />
+      )}
     </BaseLayout>
   );
 };

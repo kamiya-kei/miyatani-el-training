@@ -1,23 +1,28 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import TaskCard from "common/TaskCard";
-import FormItem from "common/FormItem";
-import DeadLine from "common/DeadLine";
-import DoneForm from "common/DoneForm";
-import PriorityForm from "common/PriorityForm";
+import TaskCard from 'common/TaskCard';
+import FormItem from 'common/FormItem';
+import DeadLine from 'common/DeadLine';
+import DoneForm from 'common/DoneForm';
+import PriorityForm from 'common/PriorityForm';
 import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
-import { Grid } from "@mui/material";
+import { Grid } from '@mui/material';
 
 const TaskForm = (props) => {
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
-  const handleAction = data => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm();
+  const handleAction = (data) => {
     console.log(data);
     props.onAction(data);
   };
@@ -28,7 +33,8 @@ const TaskForm = (props) => {
         <CardHeader title={props.title} />
         <CardContent>
           <FormItem>
-            <TextField name="title"
+            <TextField
+              name="title"
               fullWidth
               label="タスクタイトル"
               defaultValue={props.task.title || ''}
@@ -38,7 +44,8 @@ const TaskForm = (props) => {
             />
           </FormItem>
           <FormItem>
-            <TextField name="description"
+            <TextField
+              name="description"
               fullWidth
               multiline
               minRows={3}
@@ -49,7 +56,9 @@ const TaskForm = (props) => {
           </FormItem>
           <FormItem>
             <DeadLine
-              register={register} setValue={setValue} errors={errors}
+              register={register}
+              setValue={setValue}
+              errors={errors}
               defaultValue={props.task.deadline}
             />
           </FormItem>
@@ -72,8 +81,23 @@ const TaskForm = (props) => {
         </CardContent>
         <CardActions>
           <Stack spacing={2} direction="row">
-            <Button variant="contained" size="small" color="primary" onClick={handleSubmit(handleAction)}>{props.buttonText}</Button>
-            <Button variant="contained" size="small" color="secondary" component={Link} to="/" >キャンセル</Button>
+            <Button
+              variant="contained"
+              size="small"
+              color="primary"
+              onClick={handleSubmit(handleAction)}
+            >
+              {props.buttonText}
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              color="secondary"
+              component={Link}
+              to="/"
+            >
+              キャンセル
+            </Button>
           </Stack>
         </CardActions>
       </TaskCard>
@@ -83,7 +107,7 @@ const TaskForm = (props) => {
 
 TaskForm.propTypes = {
   title: PropTypes.string,
-  task:  PropTypes.object,
+  task: PropTypes.object,
   buttonText: PropTypes.string,
   onAction: PropTypes.func,
 };
