@@ -12,11 +12,11 @@ module Resolvers
     argument :page,      Int,     required: false
 
     def resolve(page: 1, **args)
-      if args.empty?
-        tasks = Task.all.order(created_at: 'DESC')
-      else
-        tasks = Task.search(**args.slice(:word, :target, :done_ids, :sort_type, :is_asc))
-      end
+      tasks = if args.empty?
+                Task.all.order(created_at: 'DESC')
+              else
+                Task.search(**args.slice(:word, :target, :done_ids, :sort_type, :is_asc))
+              end
       count = tasks.count
       {
         tasks: tasks.page(page).per(PER_PAGE),
