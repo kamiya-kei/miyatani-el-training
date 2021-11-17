@@ -162,7 +162,7 @@ const Top = () => {
       </Stack>
 
       {tasks.map(task=> (
-        <TaskCard key={task.id}>
+        <TaskCard key={task.id} className="task-card">{/* .task-card: rspec用 */}
           <CardHeader
             title={
               <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
