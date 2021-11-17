@@ -10,12 +10,14 @@ class Task < ApplicationRecord
     sort_key = sort_type.underscore # スネークケースに変換
     sort_val = is_asc ? 'ASC' : 'DESC'
     Task.
-      where(done_id: done_ids).
+      filter_by_done_ids(done_ids).
       search_word("%#{word}%", target).
       order(sort_key => sort_val)
   end
 
   scope :search_word, ->(word_ptn, target) do
+    return if ['', '%%'].include?(word_ptn) # 検索ワード空文字の場合検索不要
+
     case target
     when 'all'
       where('title LIKE ? OR description LIKE ?', word_ptn, word_ptn)
@@ -24,5 +26,11 @@ class Task < ApplicationRecord
     when 'description'
       where('description LIKE ?', word_ptn)
     end
+  end
+
+  scope :filter_by_done_ids, ->(done_ids) do
+    return if done_ids.count == 3 # 全てのステータスの場合フィルタリング不要
+
+    where(done_id: done_ids)
   end
 end
