@@ -26,36 +26,11 @@ const SearchForm = (props) => {
     const formData = new FormData(formRef.current);
     console.log([...formData.entries()]);
 
-    axios.post('/graphql', {
-      query: `
-        {
-          tasks(
-            word: "${formData.get('word')}",
-            doneIds: [${formData.getAll('done_ids[]')}],
-            sortType: "${props.sortType}",
-            isAsc: ${props.isAsc},
-            target: "${formData.get('target')}"
-          ) {
-            id
-            title
-            description
-            deadline
-            done {
-              id
-              text
-            }
-            priorityNumber
-            createdAt
-          }
-        }
-      `})
-      .then(res => {
-        props.onSearch(res.data.data.tasks);
-      })
-      .catch(error => {
-        alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
-        console.error(error);
-      });
+    props.onSearch({
+      word: formData.get('word'),
+      target: formData.get('target'),
+      doneIds: formData.getAll('done_ids[]'),
+    });
   };
 
   return (

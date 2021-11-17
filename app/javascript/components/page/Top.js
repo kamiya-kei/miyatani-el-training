@@ -8,7 +8,6 @@ import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
 import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
 import BaseLayout from 'BaseLayout';
@@ -18,55 +17,74 @@ import FlashMessage from 'common/FlashMessage';
 import SortForm from 'common/SortForm';
 import SearchForm from 'common/SearchForm';
 import Priority from 'common/Priority';
+import DoneChip from 'common/DoneChip';
+import TasksPagination from 'common/TasksPagination';
 import { DATETIME_FORMAT } from 'utils/constants';
 
-const DoneChip = (props) => {
-  const COLORS = {
-    '-1': 'default',
-    '0' : 'warning',
-    '1' : 'success' 
-  };
-  const color = COLORS[props.done.id];
-  return (
-    <Chip label={props.done.text} color={color} size="small" />
-  );
+const DEFAULT_SEARCH_PARAMETERS = {
+  word: '',
+  target: 'all',
+  doneIds: ['-1', '0', '1'],
+  sortType: 'createdAt',
+  isAsc: false,
+  page: 1,
 };
 
 const Top = () => {
-  const [tasks, setTasks] = useState([]);
-  const [sortType, setSortType] = useState('createdAt');
-  const [isAsc, setIsAsc] = useState(false);
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMETERS);
+  const [tasks, setTasks] = useState([]);  
+  const [maxPage, setMaxPage] = useState(1);
 
   const { state } = useLocation();
   const confirmDialogRef = useRef();
   const flashMessageRef = useRef();
 
-  useEffect(() => {
+  const getTasks = (newParams={}) => {
+    const allParams = { ...searchParams, ...newParams }; // 新しいパラメータを上書き
+    const { page, word, target, doneIds, sortType, isAsc } = allParams;
+    setSearchParams(allParams);
+
     axios.post('/graphql', {
       query: `
         {
-          tasks(page: ${page}) {
-            id
-            title
-            description
-            deadline
-            done {
+          tasks(
+            page: ${page},
+            word: "${word}",
+            doneIds: [${doneIds}],
+            sortType: "${sortType}",
+            isAsc: ${isAsc},
+            target: "${target}"
+          ) {
+            tasks {
               id
-              text
+              title
+              description
+              deadline
+              done {
+                id
+                text
+              }
+              priorityNumber
+              createdAt
             }
-            priorityNumber
-            createdAt
+            count
+            maxPage
           }
         }
       `})
       .then(res => {
-        setTasks(res.data.data.tasks);
+        const result = res.data.data.tasks;
+        setTasks(result.tasks);
+        setMaxPage(result.maxPage);
       })
       .catch(error => {
         alert('申し訳ございません、エラーが発生しました。ページを再読み込みしてください。');
         console.error(error);
       });
+  };
+
+  useEffect(() => {
+    getTasks();
   }, []);
 
   useEffect(() => {
@@ -94,8 +112,8 @@ const Top = () => {
         }
       `})
       .then(res => {
-        // 削除を画面に反映
-        setTasks(tasks.filter(task=>task.id != id));//削除したタスク以外のタスクを残して再セット
+        // 削除後、タスク一覧のデータを再取得して更新
+        getTasks();
         // フラッシュメッセージ表示
         flashMessageRef.current.showMessage('タスクが削除されました');
       })
@@ -106,22 +124,16 @@ const Top = () => {
   };
 
   // タスク一覧のソート処理
-  const getValueForSort = (sortType) => {
-    return sortType == 'priorityNumber' ? 
-      (task) => task.priorityNumber :
-      (task) => dayjs(task[sortType] || '2100-01-01');// 期限が設定されていないものは遥か未来として扱う
-  };
   const handleChangeSort = (sortType, isAsc) => {
-    const f = getValueForSort(sortType);
-    const n = isAsc ? 1 : -1;
-    const sortedTasks = Array.from(tasks).sort((a, b) => (f(a) - f(b)) * n);
-    setTasks(sortedTasks);
-    setSortType(sortType);
-    setIsAsc(isAsc);
+    getTasks({sortType, isAsc, page: 1});
   };
 
-  const handleSearch = (tasks) => {
-    setTasks(tasks);
+  const handleSearch = ({word, target, doneIds}) => {
+    getTasks({word, target, doneIds, page: 1});
+  };
+
+  const handleClickPagination = (page) => {
+    getTasks({page});
   };
 
   return (
@@ -131,10 +143,10 @@ const Top = () => {
 
       <Stack spacing={2} style={{ padding: '20px 0' }}>
         <div>
-          <SearchForm sortType={sortType} isAsc={isAsc} onSearch={handleSearch} />
+          <SearchForm onSearch={handleSearch} />
         </div>
         <div>
-          <SortForm sortType={sortType} isAsc={isAsc} onChange={handleChangeSort} />
+          <SortForm sortType={searchParams.sortType} isAsc={searchParams.isAsc} onChange={handleChangeSort} />
         </div>
       </Stack>
 
@@ -174,6 +186,10 @@ const Top = () => {
           </CardActions>
         </TaskCard>
       ))}
+
+      <div style={{ padding: '20px 0' }}>
+        <TasksPagination page={searchParams.page} maxPage={maxPage} onClick={handleClickPagination} />
+      </div>
     </BaseLayout>
   );
 };
