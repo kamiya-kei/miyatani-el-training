@@ -25,6 +25,7 @@ const TaskEdit = () => {
             done {
               id
             }
+            priorityNumber
             createdAt
           }
         }
@@ -49,6 +50,7 @@ const TaskEdit = () => {
               description: "${data.description}"
               deadline: "${data.deadline}"
               doneId: "${data.done_id}"
+              priorityNumber: ${data.priorityNumber}
             }
           ){
             task {

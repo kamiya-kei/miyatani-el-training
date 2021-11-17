@@ -10,8 +10,10 @@ import TaskCard from "common/TaskCard";
 import FormItem from "common/FormItem";
 import DeadLine from "common/DeadLine";
 import DoneForm from "common/DoneForm";
+import PriorityForm from "common/PriorityForm";
 import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
+import { Grid } from "@mui/material";
 
 const TaskForm = (props) => {
   const { register, handleSubmit, formState: { errors }, setValue } = useForm();
@@ -52,10 +54,20 @@ const TaskForm = (props) => {
             />
           </FormItem>
           <FormItem>
-            <DoneForm
-              setValue={setValue}
-              defaultValue={props.task.done?.id || '-1'}
-            />
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <PriorityForm
+                  setValue={setValue}
+                  defaultValue={props.task.priorityNumber || '0'}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <DoneForm
+                  setValue={setValue}
+                  defaultValue={props.task.done?.id || '-1'}
+                />
+              </Grid>
+            </Grid>
           </FormItem>
         </CardContent>
         <CardActions>

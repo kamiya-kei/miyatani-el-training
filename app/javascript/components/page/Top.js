@@ -17,6 +17,7 @@ import ConfirmDialog from 'common/ConfirmDialog';
 import FlashMessage from 'common/FlashMessage';
 import SortForm from 'common/SortForm';
 import SearchForm from 'common/SearchForm';
+import Priority from 'common/Priority';
 import { DATETIME_FORMAT } from 'utils/constants';
 
 const DoneChip = (props) => {
@@ -53,6 +54,7 @@ const Top = () => {
               id
               text
             }
+            priorityNumber
             createdAt
           }
         }
@@ -103,7 +105,11 @@ const Top = () => {
   };
 
   // タスク一覧のソート処理
-  const getValueForSort = sortType => task => dayjs(task[sortType] || '2100-01-01'); // 期限が設定されていないものは遥か未来として扱う
+  const getValueForSort = (sortType) => {
+    return sortType == 'priorityNumber' ? 
+      (task) => task.priorityNumber :
+      (task) => dayjs(task[sortType] || '2100-01-01');// 期限が設定されていないものは遥か未来として扱う
+  };
   const handleChangeSort = (sortType, isAsc) => {
     const f = getValueForSort(sortType);
     const n = isAsc ? 1 : -1;
@@ -136,7 +142,10 @@ const Top = () => {
           <CardHeader
             title={
               <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div>{task.title}</div>
+                <div>
+                  <Priority priority={task.priorityNumber} />
+                  {task.title}
+                </div>
                 <div>
                   <DoneChip done={task.done} />
                 </div>

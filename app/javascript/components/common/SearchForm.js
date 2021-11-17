@@ -44,6 +44,7 @@ const SearchForm = (props) => {
               id
               text
             }
+            priorityNumber
             createdAt
           }
         }
