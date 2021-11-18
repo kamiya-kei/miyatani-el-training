@@ -38,7 +38,7 @@ const PriorityForm = (props) => {
 };
 
 PriorityForm.propTypes = {
-  defaultValue: PropTypes.string,
+  defaultValue: PropTypes.number,
   setValue: PropTypes.func,
 };
 

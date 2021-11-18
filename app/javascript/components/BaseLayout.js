@@ -38,7 +38,7 @@ const BaseLayout = (props) => {
 };
 
 BaseLayout.propTypes = {
-  children: PropTypes.children,
+  children: PropTypes.node,
 };
 
 export default BaseLayout;
