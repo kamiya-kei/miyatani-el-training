@@ -36,7 +36,7 @@
     "webpack-dev-server": "^3"
   },
   "engines": {
-    "node": "12.22.0"
+    "node": "16.13.0"
   },
   "scripts": {
     "webpack": "bin/webpack-dev-server"
