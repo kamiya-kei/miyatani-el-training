@@ -69,6 +69,7 @@ GEM
     babel-transpiler (0.7.0)
       babel-source (>= 4.0, < 6)
       execjs (~> 2.0)
+    bcrypt (3.1.16)
     bindex (0.8.1)
     bootsnap (1.9.1)
       msgpack (~> 1.0)
@@ -297,6 +298,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_hash
+  bcrypt
   bootsnap (>= 1.4.4)
   byebug
   capybara (>= 3.26)

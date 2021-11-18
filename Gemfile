@@ -59,6 +59,7 @@ end
 gem 'tzinfo-data', platforms: %i(mingw mswin x64_mingw jruby)
 
 gem 'active_hash'
+gem 'bcrypt'
 gem 'factory_bot_rails'
 gem 'faker'
 gem 'kaminari'
