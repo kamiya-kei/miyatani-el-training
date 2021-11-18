@@ -16,7 +16,7 @@ class User < ApplicationRecord
                          confirmation: true
   end
 
-  def self.find_by_name_password(name, password)
+  def self.search(name, password)
     user = User.find_by(name: name)
     return unless user.present? && user.compare_password(password)
 

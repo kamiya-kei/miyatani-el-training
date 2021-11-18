@@ -70,7 +70,7 @@ RSpec.describe User, type: :model do
   describe 'パスワード一致チェック' do
     subject {
       FactoryBot.create(:user, name: 'test', password: 'abc123')
-      User.find_by_name_password('test', password).present?
+      User.search('test', password).present?
     }
     context 'パスワードが正しいとき' do
       let(:password) { 'abc123' }
