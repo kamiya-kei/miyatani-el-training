@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { UserContext } from 'utils/contexts';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -10,6 +11,8 @@ import MuiLink from '@mui/material/Link';
 import Button from '@mui/material/Button';
 
 const BaseLayout = (props) => {
+  const { user } = useContext(UserContext);
+
   return (
     <>
       <CssBaseline />
@@ -20,9 +23,15 @@ const BaseLayout = (props) => {
               タスク管理システム
             </MuiLink>
           </Typography>
-          <Button component={Link} to="/tasks/new" color="inherit">
-            タスク作成
-          </Button>
+          {user.isLogin ? (
+            <Button component={Link} to="/tasks/new" color="inherit">
+              タスク作成
+            </Button>
+          ) : (
+            <Button component={Link} to="/users/sign_in" color="inherit">
+              ログイン
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Container
