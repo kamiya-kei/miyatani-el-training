@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   scope :users, format: 'json' do
     # post 'sign_up',  to: 'users#sign_up'
     post 'sign_in',  to: 'users#sign_in'
+    post 'signed_in', to: 'users#signed_in'
     post 'sign_out', to: 'users#sign_out'
   end
 
