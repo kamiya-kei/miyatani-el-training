@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { UserContext } from 'utils/contexts';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +30,13 @@ const SignIn = () => {
   } = useForm();
 
   const navigate = useNavigate();
-  const { setUser } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+
+  useEffect(() => {
+    if (!user.isLogin) return;
+    // 既にログイン済みの場合はトップへ飛ばす
+    navigate('/');
+  }, [user]);
 
   const handleAction = (data) => {
     console.log(data);
