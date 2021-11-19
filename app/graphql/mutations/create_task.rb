@@ -9,8 +9,11 @@ module Mutations
     argument :priority_number, Int,    required: false
 
     def resolve(**args)
+      user = context[:session][:user]
+      return if user.nil?
+
       task = Task.create!(
-        args.merge(user_id: User.first.id) # TODO: ログイン機能実装後修正
+        args.merge(user_id: user['id'])
       )
       {
         task: task
