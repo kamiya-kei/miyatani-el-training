@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe "Users", type: :system do
+RSpec.describe 'Users', type: :system do
   describe '新規登録' do
     let(:user) { FactoryBot.build(:user) }
 
@@ -59,7 +59,7 @@ RSpec.describe "Users", type: :system do
       it { is_expected.to have_content('ログイン') }
     end
 
-    fdescribe 'アカウント削除実行' do
+    describe 'アカウント削除実行' do
       subject {
         sign_in_as(user)
         page.all('[aria-label="アカウントメニュー"]')[0].click
@@ -74,6 +74,7 @@ RSpec.describe "Users", type: :system do
           sleep 1
         }.to change { User.count }.from(1).to(0)
       }
+
       it { is_expected.to have_no_content('タスク作成') }
       it { is_expected.to have_content('ログイン') }
     end
