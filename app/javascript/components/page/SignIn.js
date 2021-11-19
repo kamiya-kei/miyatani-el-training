@@ -2,17 +2,18 @@ import React, { useContext } from 'react';
 import { UserContext } from 'utils/contexts';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import MuiLink from '@mui/material/Link';
 import BaseLayout from 'BaseLayout';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-
+import Grid from '@mui/material/Grid';
 import axios from 'module/axios_with_csrf';
 
 const MANUAL_ERROR_MESSAGE = {
@@ -34,9 +35,25 @@ const SignIn = () => {
   const handleAction = (data) => {
     console.log(data);
     axios
-      .post('/users/sign_in', data)
+      .post('/graphql', {
+        query: `
+          mutation {
+            signIn(
+              input: {
+                name: "${data.name}"
+                password: "${data.password}"
+              }
+            ) {
+              user {
+                id
+                name
+              }
+            }
+          }
+        `,
+      })
       .then((res) => {
-        const user = res.data.user;
+        const user = res.data.data.signIn.user;
         if (!user) {
           setError('name', MANUAL_ERROR_MESSAGE);
           setError('password', MANUAL_ERROR_MESSAGE);
@@ -113,11 +130,13 @@ const SignIn = () => {
             >
               ログイン
             </Button>
-            <div style={{ textAlign: 'center' }}>
-              <Link href="#" variant="body2">
-                アカウントをお持ちでない方はこちら
-              </Link>
-            </div>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <MuiLink component={Link} to="/users/sign_up" variant="body2">
+                  アカウントをお持ちでない方はこちら
+                </MuiLink>
+              </Grid>
+            </Grid>
           </Box>
         </Box>
       </Container>
