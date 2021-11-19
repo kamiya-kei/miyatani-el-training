@@ -6,6 +6,7 @@ import Top from 'page/Top';
 import TaskPost from 'page/TaskPost';
 import TaskEdit from 'page/TaskEdit';
 import SignIn from 'page/SignIn';
+import SignUp from 'page/SignUp';
 
 const App = () => {
   const [user, setUser] = useState({
@@ -15,9 +16,18 @@ const App = () => {
 
   useEffect(() => {
     axios
-      .post('/users/signed_in')
+      .post('/graphql', {
+        query: `
+      {
+        userSignedIn{
+          id
+          name
+        }
+      }
+    `,
+      })
       .then((res) => {
-        const user = res.data.user;
+        const user = res.data.data.userSignedIn;
         setUser({ user, isLogin: !!user });
       })
       .catch((error) => {
@@ -36,6 +46,7 @@ const App = () => {
           <Route path="/tasks/new" element={<TaskPost />} />
           <Route path="/tasks/:id/edit" element={<TaskEdit />} />
           <Route path="/users/sign_in" element={<SignIn />} />
+          <Route path="/users/sign_up" element={<SignUp />} />
         </Routes>
       </BrowserRouter>
     </UserContext.Provider>
