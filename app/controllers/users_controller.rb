@@ -10,5 +10,7 @@ class UsersController < ApplicationController
   end
 
   def sign_out
+    session[:user] = nil
+    render json: { user: session[:user] }
   end
 end
