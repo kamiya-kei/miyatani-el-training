@@ -13,9 +13,12 @@ import Logout from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';
 import axios from 'module/axios_with_csrf';
+import ConfirmDialog from 'common/ConfirmDialog';
 
 const HeaderMenu = () => {
   const { user, setUser } = useContext(UserContext);
+
+  const confirmDialogRef = React.useRef();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -27,11 +30,20 @@ const HeaderMenu = () => {
   };
 
   const handleSignOut = () => {
-    console.log('SignOut!!');
     axios
-      .post('/users/sign_out')
+      .post('/graphql', {
+        query: `
+          mutation {
+            signOut(input: {}) {
+              user {
+                id
+              }
+            }
+          }
+        `,
+      })
       .then((res) => {
-        const user = res.data.user;
+        const user = res.data.data.signOut.user;
         setUser({ user, isLogin: !!user });
       })
       .catch((error) => {
@@ -42,8 +54,34 @@ const HeaderMenu = () => {
       });
   };
 
-  const handleDeleteUser = () => {
-    console.log('delete user!!');
+  const handleDeleteUser = async () => {
+    const is_agree = await confirmDialogRef.current.confirm();
+    if (!is_agree) {
+      return;
+    }
+
+    axios
+      .post('/graphql', {
+        query: `
+          mutation {
+            deleteUser(input: {}) {
+              user {
+                id
+              }
+            }
+          }
+        `,
+      })
+      .then((res) => {
+        const user = res.data.data.deleteUser.user;
+        setUser({ user, isLogin: !!user });
+      })
+      .catch((error) => {
+        alert(
+          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+        );
+        console.error(error);
+      });
   };
 
   React.useEffect(() => console.log(user), [user]);
@@ -63,6 +101,7 @@ const HeaderMenu = () => {
 
   return (
     <>
+      <ConfirmDialog ref={confirmDialogRef} />
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <Button component={Link} to="/tasks/new" color="inherit">
           タスク作成
