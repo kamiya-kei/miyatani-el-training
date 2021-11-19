@@ -5,8 +5,8 @@ module Mutations
     argument :name,     String, required: true
     argument :password, String, required: true
 
-    def resolve(**args)
-      user = User.search(params[:name], params[:password])
+    def resolve(name:, password:)
+      user = User.search(name, password)
       context[:session][:user] = user
       {
         user: user

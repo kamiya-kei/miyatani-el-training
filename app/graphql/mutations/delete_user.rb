@@ -3,7 +3,7 @@ module Mutations
     field :user, Types::UserType, null: true
 
     def resolve
-      user = context[:session][:user]
+      user = User.find(context[:session][:user]['id'])
       user.destroy!
       context[:session][:user] = nil
       {
