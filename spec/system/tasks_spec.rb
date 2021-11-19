@@ -7,7 +7,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe 'タスク一覧ページのタスク作成リンクのクリック' do
       subject {
-        visit root_path
+        sign_in_as(user)
         click_link 'タスク作成' # タスク作成ページへ
         page
       }
@@ -16,6 +16,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe '入力して投稿' do
       subject {
+        sign_in_as(user)
         visit 'tasks/new'
         fill_in 'title', with: task.title
         fill_in 'description', with: task.description
@@ -35,6 +36,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe '何も入力せずに投稿' do
       subject {
+        sign_in_as(user)
         visit 'tasks/new'
         click_button '投稿'
       }
@@ -44,6 +46,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe '入力するがキャンセル' do
       subject {
+        sign_in_as(user)
         visit 'tasks/new'
         fill_in 'title', with: task.title
         fill_in 'description', with: task.description
@@ -61,13 +64,13 @@ RSpec.describe 'Tasks', type: :system do
   end
 
   describe 'タスクの編集' do
-    let!(:task) { FactoryBot.create(:task) }
+    let!(:task) { FactoryBot.create(:task, user_id: user.id) }
     let(:task_edit_path) { "/tasks/#{task.id}/edit" }
     let(:task_after) { FactoryBot.build(:task) }
 
     describe 'タスク一覧の編集ボタンをクリック' do
       subject {
-        visit root_path
+        sign_in_as(user)
         click_link '編集' # 編集ページへ
         page
       }
@@ -82,6 +85,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe 'タスクの編集を実行' do
       subject {
+        sign_in_as(user)
         visit task_edit_path
         fill_in 'title', with: task_after.title
         fill_in 'description', with: task_after.description
@@ -107,6 +111,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe 'タスクの編集をキャンセル' do
       subject {
+        sign_in_as(user)
         visit task_edit_path
         fill_in 'title', with: task_after.title
         fill_in 'description', with: task_after.description
@@ -131,7 +136,7 @@ RSpec.describe 'Tasks', type: :system do
   end
 
   describe 'タスクの削除' do
-    let!(:task) { FactoryBot.create(:task) }
+    let!(:task) { FactoryBot.create(:task, user_id: user.id) }
     let(:click_delete) {
       visit root_path
       click_button '削除'
@@ -140,6 +145,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe 'タスクの削除実行' do
       subject {
+        sign_in_as(user)
         click_delete
         click_button 'はい'
         page
@@ -163,6 +169,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe 'タスク削除のキャンセル' do
       subject {
+        sign_in_as(user)
         click_delete
         click_button 'いいえ'
         page
@@ -194,7 +201,8 @@ RSpec.describe 'Tasks', type: :system do
 
     context 'ページ表示直後' do
       subject {
-        visit root_path
+        sign_in_as(user)
+        sleep 1
         page.body
       }
       it '作成日時降順に並んでいる' do
@@ -204,7 +212,7 @@ RSpec.describe 'Tasks', type: :system do
 
     context '作成日時の並べ替えボタンをクリックしたとき' do
       subject {
-        visit root_path
+        sign_in_as(user)
         click_button '作成日時'
         page.body
       }
@@ -215,7 +223,7 @@ RSpec.describe 'Tasks', type: :system do
 
     context '期限の並べ替えボタンをクリックしたとき' do
       subject {
-        visit root_path
+        sign_in_as(user)
         click_button '期限'
         page.body
       }
@@ -226,7 +234,7 @@ RSpec.describe 'Tasks', type: :system do
 
     context '期限の並べ替えボタンを2回クリックしたとき' do
       subject {
-        visit root_path
+        sign_in_as(user)
         2.times { click_button '期限' }
         page.body
       }
@@ -237,7 +245,7 @@ RSpec.describe 'Tasks', type: :system do
 
     context '優先度の並べ替えボタンをクリックしたとき' do
       subject {
-        visit root_path
+        sign_in_as(user)
         click_button '優先度'
         page.body
       }
@@ -248,7 +256,7 @@ RSpec.describe 'Tasks', type: :system do
 
     context '優先度の並べ替えボタンを2回クリックしたとき' do
       subject {
-        visit root_path
+        sign_in_as(user)
         2.times { click_button '優先度' }
         page.body
       }
@@ -271,7 +279,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe 'タイトルのキーワード検索＆ステータス未着手で検索' do
       subject {
-        visit root_path
+        sign_in_as(user)
         fill_in 'word', with: 'AA'
         find('label', exact_text: 'タイトル').click
         find('label', exact_text: '着手').click # チェック解除
@@ -288,7 +296,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe '内容のキーワード検索＆ステータス着手・完了で検索' do
       subject {
-        visit root_path
+        sign_in_as(user)
         fill_in 'word', with: 'XXX'
         find('label', exact_text: '内容').click
         find('label', exact_text: '未着手').click # チェック解除
@@ -312,7 +320,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe 'タスク一覧1ページ目' do
       subject {
-        visit root_path
+        sign_in_as(user)
         page
       }
       it '10件のタスクのみ表示されている' do
@@ -335,7 +343,7 @@ RSpec.describe 'Tasks', type: :system do
 
     describe 'タスク一覧2ページ目' do
       subject {
-        visit root_path
+        sign_in_as(user)
         page.all('[aria-label="Go to page 2"]')[0].click
         page
       }
