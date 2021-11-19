@@ -7,6 +7,7 @@ import TaskPost from 'page/TaskPost';
 import TaskEdit from 'page/TaskEdit';
 import SignIn from 'page/SignIn';
 import SignUp from 'page/SignUp';
+import UnSignedTop from 'page/UnSignedTop';
 
 const App = () => {
   const [user, setUser] = useState({
@@ -42,7 +43,7 @@ const App = () => {
     <UserContext.Provider value={{ user, setUser }}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Top />} />
+          <Route path="/" element={user.isLogin ? <Top /> : <UnSignedTop />} />
           <Route path="/tasks/new" element={<TaskPost />} />
           <Route path="/tasks/:id/edit" element={<TaskEdit />} />
           <Route path="/users/sign_in" element={<SignIn />} />
