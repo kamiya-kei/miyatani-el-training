@@ -10,7 +10,10 @@ module Mutations
     argument :priority_number, Int,    required: false
 
     def resolve(**args)
-      task = Task.find(args[:id])
+      user = context[:session][:user]
+      return if user.nil?
+
+      task = Task.where(user_id: user['id']).find(args[:id])
       task.update!(
         args.except(:id)
       )
