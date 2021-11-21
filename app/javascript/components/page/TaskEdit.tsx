@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import axios from 'module/axios_with_csrf';
 import BaseLayout from 'BaseLayout';
 import TaskForm from 'common/TaskForm';
 import { Task } from 'utils/types';
+import { client } from 'common/MyApolloProvider';
+import { GQL_TASK, GQL_UPDATE_TASK } from 'utils/gql';
 
 const TaskEdit = () => {
   const navigate = useNavigate();
@@ -13,69 +14,33 @@ const TaskEdit = () => {
   const [task, setTask] = React.useState({} as Task);
 
   useEffect(() => {
-    axios
-      .post('/graphql', {
-        query: `
-        {
-          task(id: ${params.id}) {
-            id
-            title
-            description
-            deadline
-            done {
-              id
-            }
-            priorityNumber
-            createdAt
-          }
-        }
-      `,
+    client
+      .mutate({
+        mutation: GQL_TASK,
+        variables: { id: params.id },
       })
-      .then((res) => {
-        setTask(res.data.data.task);
-      })
-      .catch((error) => {
-        alert(
-          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-        );
-        console.error(error);
+      .then(({ data }) => {
+        setTask(data.task);
       });
   }, []);
 
   const handleEdit = (data) => {
-    axios
-      .post('/graphql', {
-        query: `
-        mutation {
-          updateTask(
-            input:{
-              id: ${params.id}
-              title: "${data.title}"
-              description: "${data.description}"
-              deadline: "${data.deadline}"
-              doneId: "${data.done_id}"
-              priorityNumber: ${data.priorityNumber}
-            }
-          ){
-            task {
-              id
-              title
-              description
-              createdAt
-            }
-          }
-        }
-      `,
+    console.log(data);
+    client
+      .mutate({
+        mutation: GQL_UPDATE_TASK,
+        variables: {
+          id: params.id,
+          title: data.title,
+          description: data.description,
+          deadline: data.deadline,
+          doneId: data.doneId,
+          priorityNumber: data.priorityNumber,
+        },
       })
-      .then((res) => {
-        console.log(res);
+      .then(({ data }) => {
+        console.log(data);
         navigate('/', { state: { message: 'タスクを更新しました' } });
-      })
-      .catch((error) => {
-        alert(
-          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-        );
-        console.error(error);
       });
   };
 

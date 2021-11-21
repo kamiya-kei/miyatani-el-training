@@ -214,6 +214,7 @@ RSpec.describe 'Tasks', type: :system do
       subject {
         sign_in_as(user)
         click_button '作成日時'
+        sleep 1
         page.body
       }
       it '作成日時昇順に並びが変わる' do
@@ -225,6 +226,7 @@ RSpec.describe 'Tasks', type: :system do
       subject {
         sign_in_as(user)
         click_button '期限'
+        sleep 1
         page.body
       }
       it '期限降順に並びが変わる' do
@@ -236,6 +238,7 @@ RSpec.describe 'Tasks', type: :system do
       subject {
         sign_in_as(user)
         2.times { click_button '期限' }
+        sleep 1
         page.body
       }
       it '期限昇順に並びが変わる' do
@@ -247,6 +250,7 @@ RSpec.describe 'Tasks', type: :system do
       subject {
         sign_in_as(user)
         click_button '優先度'
+        sleep 1
         page.body
       }
       it '優先度降順に並びが変わる' do
@@ -258,6 +262,7 @@ RSpec.describe 'Tasks', type: :system do
       subject {
         sign_in_as(user)
         2.times { click_button '優先度' }
+        sleep 1
         page.body
       }
       it '優先度昇順に並びが変わる' do

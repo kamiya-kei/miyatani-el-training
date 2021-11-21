@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'module/axios_with_csrf';
 import { UserContext } from 'utils/contexts';
+import { client } from 'common/MyApolloProvider';
+import { GQL_USER_SIGNED_IN } from 'utils/gql';
 
 const UserProvider = (props: { children: React.ReactNode }) => {
-  const [user, setUserData] = useState({ id: '', name: '' });
+  const [user, setUserData] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
 
   const setUser = (user) => {
@@ -12,27 +13,16 @@ const UserProvider = (props: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    axios
-      .post('/graphql', {
-        query: `
-      {
-        userSignedIn{
-          id
-          name
-        }
-      }
-    `,
-      })
-      .then((res) => {
-        const user = res.data.data.userSignedIn;
-        setUser(user);
-      })
-      .catch((error) => {
+    client.query({ query: GQL_USER_SIGNED_IN }).then(({ data, error }) => {
+      if (error) {
         alert(
           '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
         );
         console.error(error);
-      });
+        return;
+      }
+      setUser(data.userSignedIn);
+    });
   }, []);
 
   return (

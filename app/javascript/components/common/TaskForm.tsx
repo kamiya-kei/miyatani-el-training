@@ -18,7 +18,7 @@ import { Task } from 'utils/types';
 export type Inputs = {
   title: string;
   description: string;
-  done_id: string;
+  doneId: string;
   priorityNumber: number;
   deadline: string;
 };

@@ -1,44 +1,28 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'module/axios_with_csrf';
 import BaseLayout from 'BaseLayout';
 import TaskForm from 'common/TaskForm';
+import { client } from 'common/MyApolloProvider';
+import { GQL_CREATE_TASK } from 'utils/gql';
 
 const TaskPost = () => {
   const navigate = useNavigate();
 
   const handleAdd = (data) => {
-    axios
-      .post('/graphql', {
-        query: `
-        mutation {
-          createTask(
-            input:{
-              title: "${data.title}"
-              description: "${data.description}"
-              deadline: "${data.deadline}"
-              doneId: "${data.done_id}"
-              priorityNumber: ${data.priorityNumber}
-            }
-          ) {
-            task {
-              id
-              title
-              description
-              createdAt
-            }
-          }
-        }
-      `,
+    client
+      .mutate({
+        mutation: GQL_CREATE_TASK,
+        variables: {
+          title: data.title,
+          description: data.description,
+          deadline: data.deadline,
+          doneId: data.doneId,
+          priorityNumber: data.priorityNumber,
+        },
       })
-      .then(() => {
+      .then(({ data }) => {
+        console.log(data);
         navigate('/', { state: { message: 'タスクを投稿しました' } });
-      })
-      .catch((error) => {
-        alert(
-          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-        );
-        console.error(error);
       });
   };
 

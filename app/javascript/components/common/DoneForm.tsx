@@ -18,7 +18,7 @@ const DoneForm = (props: DoneFormProps) => {
 
   const handleChange = (event) => {
     setDone(event.target.value);
-    props.setValue('done_id', event.target.value);
+    props.setValue('doneId', event.target.value);
   };
 
   return (
