@@ -11,8 +11,8 @@ import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
 import BaseLayout from 'BaseLayout';
 import TaskCard from 'common/TaskCard';
-import ConfirmDialog from 'common/ConfirmDialog';
-import FlashMessage from 'common/FlashMessage';
+import ConfirmDialog, { ConfirmDialogHandler } from 'common/ConfirmDialog';
+import FlashMessage, { FlashMessageHandler } from 'common/FlashMessage';
 import SortForm from 'common/SortForm';
 import SearchForm from 'common/SearchForm';
 import Priority from 'common/Priority';
@@ -38,8 +38,8 @@ const Top = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { state } = useLocation();
-  const confirmDialogRef = useRef();
-  const flashMessageRef = useRef();
+  const confirmDialogRef = useRef({} as ConfirmDialogHandler);
+  const flashMessageRef = useRef({} as FlashMessageHandler);
 
   const getTasks = (newParams = {}) => {
     const allParams = { ...searchParams, ...newParams }; // 新しいパラメータを上書き
@@ -99,18 +99,17 @@ const Top = () => {
   }, []);
 
   useEffect(() => {
-    if (!state) {
-      return;
-    }
+    if (!state) return;
+
     // タスク作成・編集画面から戻ってきた時にフラッシュメッセージを表示する
+    if (!flashMessageRef.current) return;
     flashMessageRef.current.showMessage(state.message);
   }, [state]);
 
   const handleDelete = async (id) => {
+    if (!confirmDialogRef.current) return;
     const is_agree = await confirmDialogRef.current.confirm();
-    if (!is_agree) {
-      return;
-    }
+    if (!is_agree) return;
 
     axios
       .post('/graphql', {

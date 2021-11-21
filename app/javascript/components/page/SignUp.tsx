@@ -26,13 +26,11 @@ const SignUp = () => {
   } = useForm();
 
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
+  const { setUser, isLogin } = useContext(UserContext);
 
   useEffect(() => {
-    if (!user.isLogin) return;
-    // 既にログイン済みの場合はトップへ飛ばす
-    navigate('/');
-  }, [user]);
+    if (isLogin) navigate('/'); // 既にログイン済みの場合はトップへ飛ばす
+  }, [isLogin]);
 
   const handleAction = (data) => {
     axios
@@ -56,7 +54,7 @@ const SignUp = () => {
       })
       .then((res) => {
         const user = res.data.data.createUser.user;
-        setUser({ user, isLogin: true });
+        setUser(user);
         navigate('/');
       })
       .catch((error) => {

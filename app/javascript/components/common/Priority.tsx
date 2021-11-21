@@ -1,23 +1,23 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Chip from '@mui/material/Chip';
 
-const TEXTS = ['低', '中', '高'];
-const COLORS = ['default', 'warning', 'error'];
+type PriorityId = 0 | 1 | 2;
 
-const Priority = (props) => {
+const TEXTS: ['低', '中', '高'] = ['低', '中', '高'];
+const PriorityText = (id: PriorityId) => TEXTS[id];
+
+const COLORS: ['default', 'warning', 'error'] = ['default', 'warning', 'error'];
+const PriorityColor = (id: PriorityId) => COLORS[id];
+
+const Priority = (props: { priority: PriorityId }) => {
   return (
     <Chip
-      label={TEXTS[props.priority]}
-      color={COLORS[props.priority]}
+      label={PriorityText(props.priority)}
+      color={PriorityColor(props.priority)}
       size="small"
       sx={{ marginRight: '10px' }}
     />
   );
-};
-
-Priority.propTypes = {
-  priority: PropTypes.number,
 };
 
 export default Priority;

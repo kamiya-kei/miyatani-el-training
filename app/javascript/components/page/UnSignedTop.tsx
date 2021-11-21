@@ -31,7 +31,7 @@ const UnSignedTop = () => {
             title={
               <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
-                  <Priority priority="2" />
+                  <Priority priority={2} />
                   タスク管理をはじめる
                 </div>
                 <div>

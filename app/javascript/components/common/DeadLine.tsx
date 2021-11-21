@@ -19,7 +19,6 @@ const DeadLine = (props) => {
   return (
     <LocalizationProvider dateAdapter={DateAdapter}>
       <DateTimePicker
-        name="deadline"
         label="期限"
         inputFormat="YYYY-MM-DD HH:mm:ss"
         value={value}

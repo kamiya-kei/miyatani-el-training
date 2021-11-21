@@ -5,11 +5,26 @@ import axios from 'module/axios_with_csrf';
 import BaseLayout from 'BaseLayout';
 import TaskForm from 'common/TaskForm';
 
+interface Done {
+  id: string;
+  text: string;
+}
+
+interface Task {
+  id?: string;
+  title?: string;
+  description?: string;
+  deadline?: Date;
+  done?: Done;
+  priorityNumber?: 0 | 1 | 2;
+  createdAt?: Date;
+}
+
 const TaskEdit = () => {
   const navigate = useNavigate();
   const params = useParams();
 
-  const [task, setTask] = React.useState({});
+  const [task, setTask] = React.useState({} as Task);
 
   useEffect(() => {
     axios

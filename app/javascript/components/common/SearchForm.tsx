@@ -17,7 +17,6 @@ const SearchForm = (props) => {
 
   const handleSubmit = () => {
     const formData = new FormData(formRef.current);
-    console.log([...formData.entries()]);
 
     props.onSearch({
       word: formData.get('word'),

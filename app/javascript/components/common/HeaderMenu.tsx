@@ -13,12 +13,12 @@ import Logout from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';
 import axios from 'module/axios_with_csrf';
-import ConfirmDialog from 'common/ConfirmDialog';
+import ConfirmDialog, { ConfirmDialogHandler } from 'common/ConfirmDialog';
 
 const HeaderMenu = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { setUser, isLogin } = useContext(UserContext);
 
-  const confirmDialogRef = React.useRef();
+  const confirmDialogRef = React.useRef({} as ConfirmDialogHandler);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -44,7 +44,7 @@ const HeaderMenu = () => {
       })
       .then((res) => {
         const user = res.data.data.signOut.user;
-        setUser({ user, isLogin: !!user });
+        setUser(user);
       })
       .catch((error) => {
         alert(
@@ -55,6 +55,7 @@ const HeaderMenu = () => {
   };
 
   const handleDeleteUser = async () => {
+    if (!confirmDialogRef.current) return;
     const is_agree = await confirmDialogRef.current.confirm();
     if (!is_agree) {
       return;
@@ -74,7 +75,7 @@ const HeaderMenu = () => {
       })
       .then((res) => {
         const user = res.data.data.deleteUser.user;
-        setUser({ user, isLogin: !!user });
+        setUser(user);
       })
       .catch((error) => {
         alert(
@@ -84,9 +85,7 @@ const HeaderMenu = () => {
       });
   };
 
-  React.useEffect(() => console.log(user), [user]);
-
-  if (!user.isLogin) {
+  if (!isLogin) {
     return (
       <>
         <Button component={Link} to="/users/sign_in" color="inherit">

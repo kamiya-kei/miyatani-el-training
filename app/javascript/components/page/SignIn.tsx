@@ -30,13 +30,11 @@ const SignIn = () => {
   } = useForm();
 
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
+  const { setUser, isLogin } = useContext(UserContext);
 
   useEffect(() => {
-    if (!user.isLogin) return;
-    // 既にログイン済みの場合はトップへ飛ばす
-    navigate('/');
-  }, [user]);
+    if (isLogin) navigate('/'); // 既にログイン済みの場合はトップへ飛ばす
+  }, [isLogin]);
 
   const handleAction = (data) => {
     console.log(data);
@@ -65,7 +63,7 @@ const SignIn = () => {
           setError('password', MANUAL_ERROR_MESSAGE);
           return;
         }
-        setUser({ user, isLogin: true });
+        setUser(user);
         navigate('/');
       })
       .catch((error) => {
