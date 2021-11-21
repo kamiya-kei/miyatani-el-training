@@ -35,7 +35,7 @@ const UnSignedTop = () => {
                   タスク管理をはじめる
                 </div>
                 <div>
-                  <DoneChip done={{ id: -1, text: '未着手' }} />
+                  <DoneChip done={{ id: '-1', text: '未着手' }} />
                 </div>
               </Box>
             }

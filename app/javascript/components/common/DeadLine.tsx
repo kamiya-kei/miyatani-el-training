@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import { UseFormSetValue, UseFormRegister, FieldError } from 'react-hook-form';
+import { Inputs } from 'common/TaskForm';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import TextField from '@mui/material/TextField';
@@ -7,7 +8,14 @@ import DateAdapter from '@mui/lab/AdapterDayjs';
 import dayjs from 'dayjs';
 import { DATETIME_FORMAT } from 'utils/constants';
 
-const DeadLine = (props) => {
+interface DeadLineProps {
+  defaultValue: string;
+  setValue: UseFormSetValue<Inputs>;
+  register: UseFormRegister<Inputs>;
+  error?: FieldError;
+}
+
+const DeadLine = (props: DeadLineProps) => {
   const [value, setValue] = useState(new Date(props.defaultValue || ''));
 
   const handleChange = (newValue) => {
@@ -33,20 +41,13 @@ const DeadLine = (props) => {
                 message: '日時の書式が変です',
               },
             })}
-            error={!!props.errors.deadline}
-            helperText={props.errors.deadline?.message}
+            error={!!props.error}
+            helperText={props.error?.message}
           />
         )}
       />
     </LocalizationProvider>
   );
-};
-
-DeadLine.propTypes = {
-  defaultValue: PropTypes.string,
-  setValue: PropTypes.func,
-  register: PropTypes.func,
-  errors: PropTypes.object,
 };
 
 export default DeadLine;

@@ -21,19 +21,27 @@ import TasksPagination from 'common/TasksPagination';
 import { DATETIME_FORMAT } from 'utils/constants';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import { SortType, SearchTarget, Task } from 'utils/types';
 
-const DEFAULT_SEARCH_PARAMETERS = {
+const DEFAULT_SEARCH_PARAMETERS: {
+  word: string;
+  target: SearchTarget;
+  doneIds: ('-1' | '0' | '1')[];
+  sortType: SortType;
+  isAsc: boolean;
+  page: number;
+} = {
   word: '',
   target: 'all',
   doneIds: ['-1', '0', '1'],
-  sortType: 'createdAt',
+  sortType: 'created_at',
   isAsc: false,
   page: 1,
 };
 
 const Top = () => {
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMETERS);
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([] as Task[]);
   const [maxPage, setMaxPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 

@@ -4,21 +4,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'module/axios_with_csrf';
 import BaseLayout from 'BaseLayout';
 import TaskForm from 'common/TaskForm';
-
-interface Done {
-  id: string;
-  text: string;
-}
-
-interface Task {
-  id?: string;
-  title?: string;
-  description?: string;
-  deadline?: Date;
-  done?: Done;
-  priorityNumber?: 0 | 1 | 2;
-  createdAt?: Date;
-}
+import { Task } from 'utils/types';
 
 const TaskEdit = () => {
   const navigate = useNavigate();

@@ -1,17 +1,23 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { SortType } from 'utils/types';
+interface ArrowToggleIconProps {
+  isAsc: boolean;
+}
 
-const ArrowToggleIcon = (props) =>
+const ArrowToggleIcon = (props: ArrowToggleIconProps) =>
   props.isAsc ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />;
-ArrowToggleIcon.propTypes = {
-  isAsc: PropTypes.bool,
-};
 
-const SortForm = (props) => {
+interface SortFormProps {
+  onChange: (sortType: SortType, isAsc: boolean) => void;
+  sortType: SortType;
+  isAsc: boolean;
+}
+
+const SortForm = (props: SortFormProps) => {
   const handleChange = (event, newValue) => {
     if (newValue) {
       // 並び替え項目を切り替えて、降順にリセット
@@ -31,9 +37,9 @@ const SortForm = (props) => {
         exclusive
         onChange={handleChange}
       >
-        <ToggleButton value="createdAt" sx={{ width: '110px' }}>
+        <ToggleButton value="created_at" sx={{ width: '110px' }}>
           作成日時
-          {props.sortType === 'createdAt' && (
+          {props.sortType === 'created_at' && (
             <ArrowToggleIcon isAsc={props.isAsc} />
           )}
         </ToggleButton>
@@ -43,21 +49,15 @@ const SortForm = (props) => {
             <ArrowToggleIcon isAsc={props.isAsc} />
           )}
         </ToggleButton>
-        <ToggleButton value="priorityNumber" sx={{ width: '100px' }}>
+        <ToggleButton value="priority_number" sx={{ width: '100px' }}>
           優先度
-          {props.sortType === 'priorityNumber' && (
+          {props.sortType === 'priority_number' && (
             <ArrowToggleIcon isAsc={props.isAsc} />
           )}
         </ToggleButton>
       </ToggleButtonGroup>
     </>
   );
-};
-
-SortForm.propTypes = {
-  onChange: PropTypes.func,
-  sortType: PropTypes.string,
-  isAsc: PropTypes.bool,
 };
 
 export default SortForm;
