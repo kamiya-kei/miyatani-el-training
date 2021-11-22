@@ -1,6 +1,6 @@
 module Mutations
   class AdminCreateUser < BaseMutation
-    field :user,   Types::UserType, null: false
+    field :user, Types::UserType, null: false
 
     argument :name,                  String, required: true
     argument :password,              String, required: true
