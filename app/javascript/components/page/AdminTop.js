@@ -40,7 +40,7 @@ const AdminTop = () => {
                     {user.id}
                   </TableCell>
                   <TableCell align="left">{user.name}</TableCell>
-                  <TableCell align="right">{user.taskCount}</TableCell>
+                  <TableCell align="right">{user.tasksCount}</TableCell>
                   <TableCell>
                     {dayjs(user.createdAt).format(DATETIME_FORMAT)}
                   </TableCell>

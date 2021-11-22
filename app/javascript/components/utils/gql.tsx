@@ -185,7 +185,7 @@ export const GQL_USERS = gql`
       id
       name
       createdAt
-      taskCount
+      tasksCount
     }
   }
 `;
