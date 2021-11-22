@@ -176,3 +176,16 @@ export const GQL_DELETE_USER = gql`
     }
   }
 `;
+
+// for admin -------------------------------
+
+export const GQL_USERS = gql`
+  {
+    users {
+      id
+      name
+      createdAt
+      taskCount
+    }
+  }
+`;

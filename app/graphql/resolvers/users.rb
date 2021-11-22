@@ -3,7 +3,7 @@ module Resolvers
     type [Types::UserType], null: false
 
     def resolve
-      User.all
+      User.includes(:tasks).order(created_at: 'DESC')
     end
   end
 end
