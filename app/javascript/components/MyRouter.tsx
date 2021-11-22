@@ -9,6 +9,7 @@ import SignIn from 'page/SignIn';
 import SignUp from 'page/SignUp';
 import UnSignedTop from 'page/UnSignedTop';
 import AdminTop from 'page/AdminTop';
+import AdminUserCreate from 'page/AdminUserCreate';
 
 const MyRouter = () => {
   const { isLogin } = useContext(UserContext);
@@ -22,6 +23,7 @@ const MyRouter = () => {
         <Route path="/users/sign_in" element={<SignIn />} />
         <Route path="/users/sign_up" element={<SignUp />} />
         <Route path="/admin" element={<AdminTop />} />
+        <Route path="/admin/users/new" element={<AdminUserCreate />} />
       </Routes>
     </BrowserRouter>
   );

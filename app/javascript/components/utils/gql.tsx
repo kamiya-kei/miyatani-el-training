@@ -114,38 +114,47 @@ export const GQL_DELETE_TASK = gql`
   }
 `;
 
+const USER_FRAGMENT = gql`
+  fragment UserFragment on User {
+    id
+    name
+    createdAt
+  }
+`;
+
 export const GQL_USER_SIGNED_IN = gql`
+  ${USER_FRAGMENT}
   {
     userSignedIn {
-      id
-      name
+      ...UserFragment
     }
   }
 `;
 
 export const GQL_SIGN_IN = gql`
+  ${USER_FRAGMENT}
   mutation signIn($name: String!, $password: String!) {
     signIn(input: { name: $name, password: $password }) {
       user {
-        id
-        name
+        ...UserFragment
       }
     }
   }
 `;
 
 export const GQL_SIGN_OUT = gql`
+  ${USER_FRAGMENT}
   mutation {
     signOut(input: {}) {
       user {
-        id
-        name
+        ...UserFragment
       }
     }
   }
 `;
 
 export const GQL_CREATE_USER = gql`
+  ${USER_FRAGMENT}
   mutation createUser(
     $name: String!
     $password: String!
@@ -159,19 +168,18 @@ export const GQL_CREATE_USER = gql`
       }
     ) {
       user {
-        id
-        name
+        ...UserFragment
       }
     }
   }
 `;
 
 export const GQL_DELETE_USER = gql`
+  ${USER_FRAGMENT}
   mutation {
     deleteUser(input: {}) {
       user {
-        id
-        name
+        ...UserFragment
       }
     }
   }
@@ -180,12 +188,32 @@ export const GQL_DELETE_USER = gql`
 // for admin -------------------------------
 
 export const GQL_USERS = gql`
+  ${USER_FRAGMENT}
   {
     users {
-      id
-      name
-      createdAt
+      ...UserFragment
       tasksCount
+    }
+  }
+`;
+
+export const GQL_ADMIN_CREATE_USERS = gql`
+  ${USER_FRAGMENT}
+  mutation adminCreateUser(
+    $name: String!
+    $password: String!
+    $passwordConfirmation: String!
+  ) {
+    adminCreateUser(
+      input: {
+        name: $name
+        password: $password
+        passwordConfirmation: $passwordConfirmation
+      }
+    ) {
+      user {
+        ...UserFragment
+      }
     }
   }
 `;

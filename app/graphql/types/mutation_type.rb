@@ -1,5 +1,6 @@
 module Types
   class MutationType < Types::BaseObject
+    field :admin_create_user, mutation: Mutations::AdminCreateUser
     field :delete_user, mutation: Mutations::DeleteUser
     field :sign_out, mutation: Mutations::SignOut
     field :sign_in, mutation: Mutations::SignIn
