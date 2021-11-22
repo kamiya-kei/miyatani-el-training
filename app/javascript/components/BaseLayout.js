@@ -7,7 +7,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import MuiLink from '@mui/material/Link';
-import Button from '@mui/material/Button';
+import HeaderMenu from 'common/HeaderMenu';
 
 const BaseLayout = (props) => {
   return (
@@ -20,9 +20,7 @@ const BaseLayout = (props) => {
               タスク管理システム
             </MuiLink>
           </Typography>
-          <Button component={Link} to="/tasks/new" color="inherit">
-            タスク作成
-          </Button>
+          <HeaderMenu />
         </Toolbar>
       </AppBar>
       <Container

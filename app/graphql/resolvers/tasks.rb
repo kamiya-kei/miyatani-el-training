@@ -2,7 +2,7 @@ module Resolvers
   class Tasks < GraphQL::Schema::Resolver
     PER_PAGE = 10
 
-    type Types::TasksType, null: false
+    type Types::TasksType, null: true
 
     argument :word, String, required: false
     argument :done_ids, [ID], required: false
@@ -12,10 +12,14 @@ module Resolvers
     argument :page,      Int,     required: false
 
     def resolve(page: 1, **args)
+      user = context[:session][:user]
+      return if user.nil?
+
+      tasks = Task.where(user_id: user['id'])
       tasks = if args.empty?
-                Task.all.order(created_at: 'DESC')
+                tasks.order(created_at: 'DESC')
               else
-                Task.search(**args.slice(:word, :target, :done_ids, :sort_type, :is_asc))
+                tasks.search(**args.slice(:word, :target, :done_ids, :sort_type, :is_asc))
               end
       count = tasks.count
       {
