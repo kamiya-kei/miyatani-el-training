@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_16_054956) do
+ActiveRecord::Schema.define(version: 2021_11_18_023010) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -23,9 +23,20 @@ ActiveRecord::Schema.define(version: 2021_11_16_054956) do
     t.datetime "deadline"
     t.integer "done_id", default: -1, null: false
     t.integer "priority_number", default: 0, null: false
-    t.index ["created_at"], name: "index_tasks_on_created_at"
-    t.index ["deadline"], name: "index_tasks_on_deadline"
-    t.index ["done_id"], name: "index_tasks_on_done_id"
+    t.bigint "user_id"
+    t.index ["user_id", "created_at"], name: "index_tasks_on_user_id_and_created_at"
+    t.index ["user_id", "deadline"], name: "index_tasks_on_user_id_and_deadline"
+    t.index ["user_id", "done_id"], name: "index_tasks_on_user_id_and_done_id"
+    t.index ["user_id", "priority_number"], name: "index_tasks_on_user_id_and_priority_number"
+    t.index ["user_id"], name: "index_tasks_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "name", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_users_on_name", unique: true
   end
 
 end

@@ -14,20 +14,23 @@ const TasksPagination = (props) => {
     });
   };
   return (
-      <>
-        <Pagination
-          page={props.page}
-          count={props.maxPage}
-          renderItem={(item) => (
-            <PaginationItem
-              {...item}
-              onClick={handleClick(item.page)}
-            />
-          )}
-          sx={{display: 'flex', justifyContent: 'center'}}
-        />
-      </>
+    <>
+      <Pagination
+        page={props.page}
+        count={props.maxPage}
+        renderItem={(item) => (
+          <PaginationItem {...item} onClick={handleClick(item.page)} />
+        )}
+        sx={{ display: 'flex', justifyContent: 'center' }}
+      />
+    </>
   );
+};
+
+TasksPagination.propTypes = {
+  onClick: PropTypes.func,
+  page: PropTypes.number,
+  maxPage: PropTypes.number,
 };
 
 export default TasksPagination;

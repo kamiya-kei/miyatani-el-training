@@ -15,4 +15,8 @@ const DoneChip = (props) => (
   <Chip label={props.done.text} color={DoneColor(props.done.id)} size="small" />
 );
 
+DoneChip.propTypes = {
+  done: PropTypes.object,
+};
+
 export default DoneChip;

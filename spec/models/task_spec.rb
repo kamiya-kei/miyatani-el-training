@@ -55,12 +55,17 @@ RSpec.describe Task, type: :model do
         to_set
     }
     let(:create_tasks) {
-      FactoryBot.create(:task, id: 0, title: 'AAAAA', description: 'XXXXX', done_id: -1)
-      FactoryBot.create(:task, id: 1, title: 'BBBBB', description: 'XXXXX', done_id: 0)
-      FactoryBot.create(:task, id: 2, title: 'CCCCC', description: 'XXAAX', done_id: 1)
-      FactoryBot.create(:task, id: 3, title: 'AABCC', description: 'XXXXX', done_id: 1)
-      FactoryBot.create(:task, id: 4, title: 'CCBAA', description: 'XXXXX', done_id: -1)
+      [
+        { id: 0, title: 'AAAAA', description: 'XXXXX', done_id: -1 },
+        { id: 1, title: 'BBBBB', description: 'XXXXX', done_id: 0 },
+        { id: 2, title: 'CCCCC', description: 'XXAAX', done_id: 1 },
+        { id: 3, title: 'AABCC', description: 'XXXXX', done_id: 1 },
+        { id: 4, title: 'CCBAA', description: 'XXXXX', done_id: -1 }
+      ].each do |args|
+        FactoryBot.create(:task, user_id: user.id, **args)
+      end
     }
+    let(:user) { FactoryBot.create(:user) }
 
     describe 'タイトル・内容両方のキーワード検索' do
       let(:params) { { word: 'AA', target: 'all' } }

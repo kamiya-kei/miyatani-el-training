@@ -10,10 +10,14 @@ const Priority = (props) => {
     <Chip
       label={TEXTS[props.priority]}
       color={COLORS[props.priority]}
-      size="small" 
+      size="small"
       sx={{ marginRight: '10px' }}
     />
   );
+};
+
+Priority.propTypes = {
+  priority: PropTypes.number,
 };
 
 export default Priority;

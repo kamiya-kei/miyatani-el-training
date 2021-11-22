@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Tasks', type: :system do
+  let(:user) { FactoryBot.create(:user) }
   describe 'タスクの作成' do
-    let(:task) { FactoryBot.build(:task) }
+    let(:task) { FactoryBot.build(:task, user_id: user.id) }
 
     describe 'タスク一覧ページのタスク作成リンクのクリック' do
       subject {
@@ -185,10 +186,10 @@ RSpec.describe 'Tasks', type: :system do
   describe 'タスク一覧の並び順' do
     let!(:tasks) {
       [
-        FactoryBot.create(:task, created_at: '2021-11-01 00:00:00', deadline: '2021-11-02 00:00:00', priority_number: 1),
-        FactoryBot.create(:task, created_at: '2021-11-02 00:00:00', deadline: '2021-11-01 00:00:00', priority_number: 2),
-        FactoryBot.create(:task, created_at: '2021-11-03 00:00:00', deadline: '2021-11-03 00:00:00', priority_number: 0)
-      ]
+        { created_at: '2021-11-01 00:00:00', deadline: '2021-11-02 00:00:00', priority_number: 1 },
+        { created_at: '2021-11-02 00:00:00', deadline: '2021-11-01 00:00:00', priority_number: 2 },
+        { created_at: '2021-11-03 00:00:00', deadline: '2021-11-03 00:00:00', priority_number: 0 }
+      ].map { |args| FactoryBot.create(:task, user_id: user.id, **args) }
     }
 
     context 'ページ表示直後' do
@@ -260,12 +261,12 @@ RSpec.describe 'Tasks', type: :system do
   describe 'タスクの検索' do
     let!(:tasks) {
       [
-        FactoryBot.create(:task, title: 'AAAAA', description: 'XXXXX', done_id: -1),
-        FactoryBot.create(:task, title: 'BBBBB', description: 'XXXXX', done_id: 0),
-        FactoryBot.create(:task, title: 'CCCCC', description: 'XXAAX', done_id: 1),
-        FactoryBot.create(:task, title: 'AABCC', description: 'XXXXX', done_id: 1),
-        FactoryBot.create(:task, title: 'CCBAA', description: 'XXXXX', done_id: -1)
-      ]
+        { title: 'AAAAA', description: 'XXXXX', done_id: -1 },
+        { title: 'BBBBB', description: 'XXXXX', done_id: 0 },
+        { title: 'CCCCC', description: 'XXAAX', done_id: 1 },
+        { title: 'AABCC', description: 'XXXXX', done_id: 1 },
+        { title: 'CCBAA', description: 'XXXXX', done_id: -1 }
+      ].map { |args| FactoryBot.create(:task, user_id: user.id, **args) }
     }
 
     describe 'タイトルのキーワード検索＆ステータス未着手で検索' do
@@ -303,7 +304,11 @@ RSpec.describe 'Tasks', type: :system do
   end
 
   describe 'ページネーション' do
-    let!(:tasks) { (0...20).map { |i| FactoryBot.create(:task, created_at: Time.current.ago(i.days)) } }
+    let!(:tasks) {
+      (0...20).
+        map { |i| { created_at: Time.current.ago(i.days) } }.
+        map { |args| FactoryBot.create(:task, user_id: user.id, **args) }
+    }
 
     describe 'タスク一覧1ページ目' do
       subject {

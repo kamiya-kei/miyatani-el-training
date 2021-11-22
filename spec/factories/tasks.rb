@@ -6,5 +6,6 @@ FactoryBot.define do
     priority_number { [0, 1, 2].sample }
     deadline { Random.rand(Time.current.since(1.month)..Time.current.since(3.months)) }
     created_at { Random.rand(Time.current.ago(1.month)..Time.current) }
+    association :user
   end
 end

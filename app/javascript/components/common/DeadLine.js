@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import TextField from '@mui/material/TextField';
@@ -19,19 +19,20 @@ const DeadLine = (props) => {
   return (
     <LocalizationProvider dateAdapter={DateAdapter}>
       <DateTimePicker
-        name='deadline'
+        name="deadline"
         label="期限"
         inputFormat="YYYY-MM-DD HH:mm:ss"
         value={value}
         onChange={handleChange}
         renderInput={(params) => (
-          <TextField name='deadline'
+          <TextField
+            name="deadline"
             {...params}
             {...props.register('deadline', {
               pattern: {
                 value: /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/,
-                message: '日時の書式が変です'
-              }
+                message: '日時の書式が変です',
+              },
             })}
             error={!!props.errors.deadline}
             helperText={props.errors.deadline?.message}
@@ -40,6 +41,13 @@ const DeadLine = (props) => {
       />
     </LocalizationProvider>
   );
+};
+
+DeadLine.propTypes = {
+  defaultValue: PropTypes.string,
+  setValue: PropTypes.func,
+  register: PropTypes.func,
+  errors: PropTypes.object,
 };
 
 export default DeadLine;

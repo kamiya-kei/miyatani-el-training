@@ -9,7 +9,9 @@ module Mutations
     argument :priority_number, Int,    required: false
 
     def resolve(**args)
-      task = Task.create!(args)
+      task = Task.create!(
+        args.merge(user_id: User.first.id) # TODO: ログイン機能実装後修正
+      )
       {
         task: task
       }

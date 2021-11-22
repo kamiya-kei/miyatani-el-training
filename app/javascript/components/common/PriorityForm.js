@@ -37,4 +37,9 @@ const PriorityForm = (props) => {
   );
 };
 
-export default PriorityForm
+PriorityForm.propTypes = {
+  defaultValue: PropTypes.number,
+  setValue: PropTypes.func,
+};
+
+export default PriorityForm;

@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-
+import React from 'react';
+import PropTypes from 'prop-types';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-const ArrowToggleIcon = (props) => (
-  props.isAsc ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />
-);
+const ArrowToggleIcon = (props) =>
+  props.isAsc ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />;
+ArrowToggleIcon.propTypes = {
+  isAsc: PropTypes.bool,
+};
 
 const SortForm = (props) => {
   const handleChange = (event, newValue) => {
@@ -32,25 +33,31 @@ const SortForm = (props) => {
       >
         <ToggleButton value="createdAt" sx={{ width: '110px' }}>
           作成日時
-          {props.sortType === 'createdAt' &&
+          {props.sortType === 'createdAt' && (
             <ArrowToggleIcon isAsc={props.isAsc} />
-          }
+          )}
         </ToggleButton>
         <ToggleButton value="deadline" sx={{ width: '100px' }}>
           期限
-          {props.sortType === 'deadline' &&
+          {props.sortType === 'deadline' && (
             <ArrowToggleIcon isAsc={props.isAsc} />
-          }
+          )}
         </ToggleButton>
         <ToggleButton value="priorityNumber" sx={{ width: '100px' }}>
           優先度
-          {props.sortType === 'priorityNumber' &&
+          {props.sortType === 'priorityNumber' && (
             <ArrowToggleIcon isAsc={props.isAsc} />
-          }
+          )}
         </ToggleButton>
       </ToggleButtonGroup>
     </>
   );
-}
+};
+
+SortForm.propTypes = {
+  onChange: PropTypes.func,
+  sortType: PropTypes.string,
+  isAsc: PropTypes.bool,
+};
 
 export default SortForm;

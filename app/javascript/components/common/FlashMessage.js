@@ -1,9 +1,8 @@
-import React, { forwardRef, useState, useImperativeHandle} from "react";
-import PropTypes from "prop-types";
+import React, { forwardRef, useState, useImperativeHandle } from 'react';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 
-const FlashMessage = forwardRef((props, ref) => {
+const FlashMessage = forwardRef((_, ref) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const handleClose = () => setOpen(false);
@@ -12,7 +11,7 @@ const FlashMessage = forwardRef((props, ref) => {
     showMessage: (message) => {
       setMessage(message);
       setOpen(true);
-    }
+    },
   }));
 
   return (
@@ -22,9 +21,13 @@ const FlashMessage = forwardRef((props, ref) => {
       autoHideDuration={6000}
       onClose={handleClose}
     >
-      <Alert severity="success" onClose={handleClose}>{message} </Alert>
+      <Alert severity="success" onClose={handleClose}>
+        {message}{' '}
+      </Alert>
     </Snackbar>
   );
 });
+
+FlashMessage.displayName = 'FlashMessage';
 
 export default FlashMessage;
