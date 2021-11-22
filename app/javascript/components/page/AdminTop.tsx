@@ -1,14 +1,15 @@
 import React from 'react';
-import BaseLayout from 'BaseLayout';
+import { Link } from 'react-router-dom';
+
 import MuiLink from '@mui/material/Link';
+import AdminLayout from 'AdminLayout';
 import UserList from 'common/UserList';
 
-import { Link } from 'react-router-dom';
 const AdminTop = () => {
   return (
-    <BaseLayout>
+    <AdminLayout>
       <div style={{ margin: '20px 0' }}>
-        <h3 style={{ textAlign: 'center' }}>管理画面 ユーザー一覧</h3>
+        <h3 style={{ textAlign: 'center' }}>ユーザー一覧</h3>
         <p style={{ textAlign: 'right', width: '100%' }}>
           <MuiLink component={Link} to="/admin/users/new">
             新規ユーザー作成
@@ -16,7 +17,7 @@ const AdminTop = () => {
         </p>
         <UserList />
       </div>
-    </BaseLayout>
+    </AdminLayout>
   );
 };
 

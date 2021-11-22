@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import BaseLayout from 'BaseLayout';
+import AdminLayout from 'AdminLayout';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -43,7 +43,7 @@ const AdminUserCreate = () => {
   };
 
   return (
-    <BaseLayout>
+    <AdminLayout>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -139,7 +139,7 @@ const AdminUserCreate = () => {
           </Box>
         </Box>
       </Container>
-    </BaseLayout>
+    </AdminLayout>
   );
 };
 
