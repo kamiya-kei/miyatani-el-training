@@ -2,8 +2,9 @@ FactoryBot.define do
   factory :task do
     title { Faker::Lorem.sentence }
     description { Faker::Lorem.sentence }
-    deadline { '2021-01-01 00:00:00' }
     done_id { Done.pluck(:id).sample }
     priority_number { [0, 1, 2].sample }
+    deadline { Random.rand(Time.current.since(1.month)..Time.current.since(3.months)) }
+    created_at { Random.rand(Time.current.ago(1.month)..Time.current) }
   end
 end

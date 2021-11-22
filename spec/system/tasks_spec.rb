@@ -301,4 +301,50 @@ RSpec.describe 'Tasks', type: :system do
       it { is_expected.to have_no_content(tasks[4].title) }
     end
   end
+
+  describe 'ページネーション' do
+    let!(:tasks) { (0...20).map { |i| FactoryBot.create(:task, created_at: Time.current.ago(i.days)) } }
+
+    describe 'タスク一覧1ページ目' do
+      subject {
+        visit root_path
+        page
+      }
+      it '10件のタスクのみ表示されている' do
+        subject
+        expect(page.all('.task-card').count).to eq 10
+      end
+
+      it '最新10件が表示されている' do
+        subject
+        expect(page).to have_content(tasks[0].title)
+        expect(page).to have_content(tasks[9].title)
+      end
+
+      it '最新10件以外のタスクが表示されていない' do
+        subject
+        expect(page).to have_no_content(tasks[10].title)
+        expect(page).to have_no_content(tasks[19].title)
+      end
+    end
+
+    describe 'タスク一覧2ページ目' do
+      subject {
+        visit root_path
+        page.all('[aria-label="Go to page 2"]')[0].click
+        page
+      }
+      it '最新11-20件が表示されている' do
+        subject
+        expect(page).to have_content(tasks[10].title)
+        expect(page).to have_content(tasks[19].title)
+      end
+
+      it '最新11-20件以外のタスクが表示されていない' do
+        subject
+        expect(page).to have_no_content(tasks[0].title)
+        expect(page).to have_no_content(tasks[9].title)
+      end
+    end
+  end
 end
