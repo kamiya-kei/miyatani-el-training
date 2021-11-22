@@ -1,5 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { UserContext } from 'utils/contexts';
+import { UtilContext } from 'utils/contexts';
+import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,13 +14,19 @@ import HeaderMenu from 'common/HeaderMenu';
 
 const AdminLayout = (props: { children: React.ReactNode }) => {
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   const { isLogin, loadingUser } = useContext(UserContext);
+  const { util } = useContext(UtilContext);
 
   useEffect(() => {
     if (loadingUser) return;
     if (!isLogin) return navigate('/users/sign_in'); // ログインしてない場合はログインページへ飛ばす // TODO: 管理者権限の確認
   }, [isLogin, loadingUser]);
+
+  useEffect(() => {
+    if (state) util.flashMessage(state.message);
+  }, [state]);
 
   return (
     <>
