@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { UtilContext } from 'utils/contexts';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -20,6 +21,8 @@ import { GQL_USERS } from 'utils/gql';
 const UserList = () => {
   const { loading, error, data } = useQuery(GQL_USERS);
 
+  const { util } = useContext(UtilContext);
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -27,8 +30,12 @@ const UserList = () => {
   };
   const handleClose = () => setAnchorEl(null);
 
-  const handleDeleteUser = () => {
+  const handleDeleteUser = async () => {
     handleClose();
+    const is_agree = await util.confirmDialog();
+    if (!is_agree) return;
+
+    // TODO: 削除
   };
 
   if (loading || error) return <></>;
