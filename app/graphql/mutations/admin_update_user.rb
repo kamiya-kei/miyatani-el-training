@@ -12,7 +12,6 @@ module Mutations
       return if user.nil? # TODO: 管理者権限の確認
 
       target_user = User.find(id)
-      binding.pry
       target_user.update!(args)
       {
         user: target_user
