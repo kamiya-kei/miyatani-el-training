@@ -34,7 +34,12 @@ const AdminLayout = (props: { children: React.ReactNode }) => {
       <AppBar>
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            <MuiLink component={Link} to="/" color="inherit" underline="none">
+            <MuiLink
+              component={Link}
+              to="/admin"
+              color="inherit"
+              underline="none"
+            >
               タスク管理システム 管理画面
             </MuiLink>
           </Typography>
