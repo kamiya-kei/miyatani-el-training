@@ -6,14 +6,18 @@ class User < ApplicationRecord
 
   has_many :tasks, dependent: :destroy
 
-  with_options presence: true do
-    validates :name, uniqueness: true
-    validates :password, length: { in: 6..128 },
-                         format: { # 半角英数両方とも含む必要がある
-                           with: /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i,
-                           message: 'is invalid. Include both letters and numbers'
-                         },
-                         confirmation: true
+  validates :name, presence: true, uniqueness: true
+  validates :password, presence: true, on: :create
+  validates :password, length: { in: 6..128 },
+                        format: { # 半角英数両方とも含む必要がある
+                          with: /\A(?=.*?[a-z])(?=.*?\d)[a-z\d]+\z/i,
+                          message: 'is invalid. Include both letters and numbers'
+                        },
+                        confirmation: true,
+                        if: :password_validation?
+
+  def password_validation?
+    self.password.present?
   end
 
   def self.search(name, password)
