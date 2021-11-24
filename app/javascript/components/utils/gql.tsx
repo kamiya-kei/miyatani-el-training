@@ -18,6 +18,7 @@ const TASK_FRAGMENT = gql`
 export const GQL_TASKS = gql`
   ${TASK_FRAGMENT}
   query tasks(
+    $userId: ID
     $page: Int
     $word: String
     $doneIds: [ID!]
@@ -26,6 +27,7 @@ export const GQL_TASKS = gql`
     $target: String
   ) {
     tasks(
+      userId: $userId
       page: $page
       word: $word
       doneIds: $doneIds

@@ -10,12 +10,19 @@ module Resolvers
     argument :is_asc,    Boolean, required: false
     argument :target,    String,  required: false
     argument :page,      Int,     required: false
+    argument :user_id,   ID,      required: false
 
-    def resolve(page: 1, **args)
+    def resolve(user_id: nil, page: 1, **args)
       user = context[:session][:user]
       return if user.nil?
 
-      tasks = Task.where(user_id: user['id'])
+      tasks = if user_id.nil?
+                Task.where(user_id: user['id'])
+              else
+                # TODO: 管理者権限の確認
+                Task.where(user_id: user_id)
+              end
+
       tasks = if args.empty?
                 tasks.order(created_at: 'DESC')
               else
