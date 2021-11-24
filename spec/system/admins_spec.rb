@@ -5,9 +5,10 @@ RSpec.describe '管理者ページ', type: :system do
     before do
       sign_in_as(admin)
     end
+
     let(:admin) { FactoryBot.create(:user) }
     let(:user) { FactoryBot.create(:user) }
-    let(:tasks) { FactoryBot.create_list(:task, :tasks_count, user_id: user.id) }
+    let(:tasks) { FactoryBot.create_list(:task, tasks_count, user_id: user.id) }
 
     describe 'ユーザー一覧' do
       subject {
@@ -18,6 +19,7 @@ RSpec.describe '管理者ページ', type: :system do
       let!(:users) { FactoryBot.create_list(:user, 3) }
       let(:tasks_count) { 5 }
       it { is_expected.to have_content('管理画面') }
+
       it 'タスク数が取得・表示できている' do
         subject
         expect(page.all("[data-test-user='#{user.id}'] td")[1].text).to eq(tasks_count.to_s)
@@ -38,7 +40,7 @@ RSpec.describe '管理者ページ', type: :system do
       let(:new_user) { FactoryBot.build(:user) }
       it { expect { subject }.to change { User.count }.from(1).to(2) }
       it { is_expected.to have_current_path('/admin') }
-      it { is_expected.to have_content('ユーザー情報を更新しました') }
+      it { is_expected.to have_content('新規ユーザーを作成しました') }
       it { is_expected.to have_content(new_user.name) }
     end
 
@@ -71,15 +73,18 @@ RSpec.describe '管理者ページ', type: :system do
         click_button 'はい'
         page
       }
-      it { expect {
-        subject
-        sleep 1
-      }.not_to(change { User.count }) }
+      it {
+        expect {
+          subject
+          sleep 1
+        }.not_to(change { User.count })
+      }
+
       it { is_expected.to have_content('ユーザーを削除しました') }
       it { is_expected.to have_no_content(user.name) }
     end
 
-    fdescribe 'ユーザータスク一覧' do
+    describe 'ユーザータスク一覧' do
       subject {
         tasks
         visit '/admin'
