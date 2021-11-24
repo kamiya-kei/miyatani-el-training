@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { UtilContext } from 'utils/contexts';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,30 +15,94 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { DATETIME_FORMAT } from 'utils/constants';
-import { useQuery } from '@apollo/client';
-import { GQL_USERS } from 'utils/gql';
+import { User } from 'utils/types';
+import { useQuery, useMutation } from '@apollo/client';
+import { GQL_USERS, GQL_ADMIN_DELETE_USER } from 'utils/gql';
 
-const UserList = () => {
-  const { loading, error, data } = useQuery(GQL_USERS);
+interface UserListRowProps {
+  user: User;
+  onDelete: (id: string) => void;
+}
 
-  const { util } = useContext(UtilContext);
-
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+const UserListRow = ({ user, onDelete }: UserListRowProps) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => setAnchorEl(null);
 
-  const handleDeleteUser = async () => {
+  const handleDelete = (id) => () => {
     handleClose();
+    onDelete(id);
+  };
+
+  return (
+    <TableRow>
+      <TableCell component="th" scope="row">
+        {user.id}
+      </TableCell>
+      <TableCell align="left">{user.name}</TableCell>
+      <TableCell align="right">{user.tasksCount}</TableCell>
+      <TableCell>{dayjs(user.createdAt).format(DATETIME_FORMAT)}</TableCell>
+      <TableCell>
+        <IconButton
+          aria-label="more"
+          id="long-button"
+          aria-controls="long-menu"
+          aria-expanded={open ? 'true' : undefined}
+          aria-haspopup="true"
+          onClick={handleClick}
+        >
+          <MoreVertIcon />
+        </IconButton>
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            'aria-labelledby': 'basic-button',
+          }}
+        >
+          <MenuItem component={Link} to={`/admin/users/${user.id}/edit`}>
+            編集
+          </MenuItem>
+          <MenuItem onClick={handleDelete(user.id)}>削除</MenuItem>
+          <MenuItem component={Link} to={`/admin/users/${user.id}/tasks`}>
+            タスク一覧
+          </MenuItem>
+        </Menu>
+      </TableCell>
+    </TableRow>
+  );
+};
+
+const UserList = () => {
+  const { util } = useContext(UtilContext);
+
+  const { loading, error, data, refetch } = useQuery(GQL_USERS);
+  const [deleteUser] = useMutation(GQL_ADMIN_DELETE_USER);
+
+  const handleDeleteUser = async (id) => {
     const is_agree = await util.confirmDialog();
     if (!is_agree) return;
 
-    // TODO: 削除
+    util.setBackdrop(true);
+    deleteUser({ variables: { id } })
+      .then(() => {
+        util.flashMessage('ユーザーが削除されました');
+        refetch();
+      })
+      .finally(() => util.setBackdrop(false));
   };
 
-  if (loading || error) return <></>;
+  useEffect(() => util.setBackdrop(loading), [loading]);
+  if (error) {
+    alert(
+      '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+    );
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -53,52 +117,12 @@ const UserList = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell component="th" scope="row">
-                {user.id}
-              </TableCell>
-              <TableCell align="left">{user.name}</TableCell>
-              <TableCell align="right">{user.tasksCount}</TableCell>
-              <TableCell>
-                {dayjs(user.createdAt).format(DATETIME_FORMAT)}
-              </TableCell>
-              <TableCell>
-                <IconButton
-                  aria-label="more"
-                  id="long-button"
-                  aria-controls="long-menu"
-                  aria-expanded={open ? 'true' : undefined}
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                >
-                  <MoreVertIcon />
-                </IconButton>
-                <Menu
-                  id="basic-menu"
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose}
-                  MenuListProps={{
-                    'aria-labelledby': 'basic-button',
-                  }}
-                >
-                  <MenuItem
-                    component={Link}
-                    to={`/admin/users/${user.id}/edit`}
-                  >
-                    編集
-                  </MenuItem>
-                  <MenuItem onClick={handleDeleteUser}>削除</MenuItem>
-                  <MenuItem
-                    component={Link}
-                    to={`/admin/users/${user.id}/tasks`}
-                  >
-                    タスク一覧
-                  </MenuItem>
-                </Menu>
-              </TableCell>
-            </TableRow>
+          {data?.users.map((user: User) => (
+            <UserListRow
+              key={user.id}
+              user={user}
+              onDelete={handleDeleteUser}
+            />
           ))}
         </TableBody>
       </Table>
