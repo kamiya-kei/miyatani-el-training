@@ -38,7 +38,7 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
   };
 
   return (
-    <TableRow>
+    <TableRow data-test-user={user.id}>
       <TableCell component="th" scope="row">
         {user.id}
       </TableCell>
@@ -68,7 +68,9 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
           <MenuItem component={Link} to={`/admin/users/${user.id}/edit`}>
             編集
           </MenuItem>
-          <MenuItem onClick={handleDelete(user.id)}>削除</MenuItem>
+          <MenuItem onClick={handleDelete(user.id)} data-test-button="delete">
+            削除
+          </MenuItem>
           <MenuItem component={Link} to={`/admin/users/${user.id}/tasks`}>
             タスク一覧
           </MenuItem>
@@ -91,7 +93,7 @@ const UserList = () => {
     util.setBackdrop(true);
     deleteUser({ variables: { id } })
       .then(() => {
-        util.flashMessage('ユーザーが削除されました');
+        util.flashMessage('ユーザーを削除しました');
         refetch();
       })
       .finally(() => util.setBackdrop(false));
