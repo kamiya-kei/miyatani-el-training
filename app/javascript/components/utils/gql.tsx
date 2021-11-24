@@ -187,6 +187,15 @@ export const GQL_DELETE_USER = gql`
 
 // for admin -------------------------------
 
+export const GQL_USER = gql`
+  ${USER_FRAGMENT}
+  query user($id: ID!) {
+    user(id: $id) {
+      ...UserFragment
+    }
+  }
+`;
+
 export const GQL_USERS = gql`
   ${USER_FRAGMENT}
   {
@@ -211,6 +220,40 @@ export const GQL_ADMIN_CREATE_USERS = gql`
         passwordConfirmation: $passwordConfirmation
       }
     ) {
+      user {
+        ...UserFragment
+      }
+    }
+  }
+`;
+
+export const GQL_ADMIN_UPDATE_USER = gql`
+  ${USER_FRAGMENT}
+  mutation adminUpdateUser(
+    $id: ID!
+    $name: String
+    $password: String
+    $passwordConfirmation: String
+  ) {
+    adminUpdateUser(
+      input: {
+        id: $id
+        name: $name
+        password: $password
+        passwordConfirmation: $passwordConfirmation
+      }
+    ) {
+      user {
+        ...UserFragment
+      }
+    }
+  }
+`;
+
+export const GQL_ADMIN_DELETE_USER = gql`
+  ${USER_FRAGMENT}
+  mutation adminDeleteUser($id: ID!) {
+    adminDeleteUser(input: { id: $id }) {
       user {
         ...UserFragment
       }

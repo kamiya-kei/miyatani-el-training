@@ -10,9 +10,9 @@ module Mutations
       user = context[:session][:user]
       return if user.nil? # TODO: 管理者権限の確認
 
-      user = User.create!(args)
+      target_user = User.create!(args)
       {
-        user: user
+        user: target_user
       }
     end
   end

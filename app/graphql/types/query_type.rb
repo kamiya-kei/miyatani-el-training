@@ -7,7 +7,7 @@ module Types
     field :task, TaskType, null: true do
       argument :id, ID, required: true
     end
-    def task(id: nil)
+    def task(id:)
       Task.find(id)
     end
     field :tasks, resolver: Resolvers::Tasks
@@ -15,7 +15,10 @@ module Types
     field :user, UserType, null: true do
       argument :id, ID, required: true
     end
-    def user(id: nil)
+    def user(id:)
+      user = User.find(context[:session][:user]['id'])
+      return if user.nil? # TODO: 管理者権限の確認
+
       User.find(id)
     end
     field :users, resolver: Resolvers::Users
