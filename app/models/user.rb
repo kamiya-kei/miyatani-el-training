@@ -5,6 +5,8 @@ class User < ApplicationRecord
   after_validation :set_encrypted_password
 
   has_many :tasks, dependent: :destroy
+  extend ActiveHash::Associations::ActiveRecordExtensions
+  belongs_to :role
 
   validates :name, presence: true, uniqueness: true
   validates :password, presence: true, on: :create
@@ -15,6 +17,7 @@ class User < ApplicationRecord
                        },
                        confirmation: true,
                        if: :password_validation?
+  validates :role_id, inclusion: { in: Role.pluck(:id) }
 
   def password_validation?
     self.password.present?
