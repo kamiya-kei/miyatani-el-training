@@ -37,11 +37,22 @@ const AdminUserUpdate = () => {
         state: { message: 'ユーザー情報を更新しました' },
       });
     },
-    onError: () => {
-      setError('name', {
-        type: 'manual',
-        message: 'このユーザー名は既に使われております',
-      });
+    onError: (res) => {
+      if (
+        res.graphQLErrors
+          .map((v) => v.message)
+          .includes('Failed to save the record')
+      ) {
+        setError('roleId', {
+          type: 'manual',
+          message: '管理ユーザーが最低1人は必要です',
+        });
+      } else {
+        setError('name', {
+          type: 'manual',
+          message: 'このユーザー名は既に使われております',
+        });
+      }
     },
   });
 
@@ -138,7 +149,11 @@ const AdminUserUpdate = () => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <RoleForm defaultValue={user.role.id} setValue={setValue} />
+                  <RoleForm
+                    defaultValue={user.role.id}
+                    setValue={setValue}
+                    error={!!errors.roleId}
+                  />
                 </Grid>
               </Grid>
               <Button

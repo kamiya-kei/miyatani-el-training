@@ -1,6 +1,7 @@
 module Mutations
   class AdminUpdateUser < BaseMutation
-    field :user, Types::UserType, null: false
+    field :user, Types::UserType, null: true
+    # field :errors, [ErrorType], null: true
 
     argument :id, ID, required: true
     argument :name,                  String, required: false
@@ -17,6 +18,8 @@ module Mutations
       {
         user: target_user
       }
+    rescue => e
+      raise GraphQL::ExecutionError.new(e.message)
     end
   end
 end
