@@ -21,12 +21,16 @@ const AdminLayout = (props: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const { isLogin, loadingUser } = useContext(UserContext);
+  const { user, isLogin, loadingUser } = useContext(UserContext);
   const { util } = useContext(UtilContext);
 
   useEffect(() => {
     if (loadingUser) return;
-    if (!isLogin) return navigate('/users/sign_in'); // ログインしてない場合はログインページへ飛ばす // TODO: 管理者権限の確認
+    if (!isLogin) return navigate('/users/sign_in'); // ログインしてない場合はログインページへ飛ばす
+    if (user.role.text !== 'admin') {
+      alert('このページは管理者専用のページです');
+      navigate('/');
+    }
   }, [isLogin, loadingUser]);
 
   useEffect(() => {

@@ -28,7 +28,7 @@ const HeaderMenu = () => {
     setAnchorEl(null);
   };
 
-  const { setUser, isLogin } = useContext(UserContext);
+  const { user, setUser, isLogin } = useContext(UserContext);
   const [signOut] = useMutationEx(GQL_SIGN_OUT, {
     onCompleted: () => {
       setUser(null);
@@ -125,13 +125,17 @@ const HeaderMenu = () => {
           </ListItemIcon>
           アカウント削除
         </MenuItem>
-        <Divider />
-        <MenuItem component={Link} to="/admin">
-          <ListItemIcon>
-            <AdminPanelSettingsIcon fontSize="small" />
-          </ListItemIcon>
-          管理ページ
-        </MenuItem>
+        {user?.role.text == 'admin' && (
+          <>
+            <Divider />
+            <MenuItem component={Link} to="/admin">
+              <ListItemIcon>
+                <AdminPanelSettingsIcon fontSize="small" />
+              </ListItemIcon>
+              管理ページ
+            </MenuItem>
+          </>
+        )}
       </Menu>
     </>
   );
