@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import { UtilContext } from 'utils/contexts';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,7 +16,8 @@ import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { DATETIME_FORMAT } from 'utils/constants';
 import { User } from 'utils/types';
-import { useQuery, useMutation } from '@apollo/client';
+import useQueryEx from 'hooks/useQueryEx';
+import useMutationEx from 'hooks/useMutationEx';
 import { GQL_USERS, GQL_ADMIN_DELETE_USER } from 'utils/gql';
 
 interface UserListRowProps {
@@ -83,28 +84,19 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
 const UserList = () => {
   const { util } = useContext(UtilContext);
 
-  const { loading, error, data, refetch } = useQuery(GQL_USERS);
-  const [deleteUser] = useMutation(GQL_ADMIN_DELETE_USER);
+  const { data, refetch } = useQueryEx(GQL_USERS);
+  const users: User[] = data.users || [];
+  const [deleteUser] = useMutationEx(GQL_ADMIN_DELETE_USER, {
+    onCompleted: () => {
+      util.flashMessage('ユーザーを削除しました');
+      refetch();
+    },
+  });
 
   const handleDeleteUser = async (id) => {
     const is_agree = await util.confirmDialog();
-    if (!is_agree) return;
-
-    util.setBackdrop(true);
-    deleteUser({ variables: { id } })
-      .then(() => {
-        util.flashMessage('ユーザーを削除しました');
-        refetch();
-      })
-      .finally(() => util.setBackdrop(false));
+    if (is_agree) deleteUser({ variables: { id } });
   };
-
-  useEffect(() => util.setBackdrop(loading), [loading]);
-  if (error) {
-    alert(
-      '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-    );
-  }
 
   return (
     <TableContainer component={Paper}>
@@ -119,7 +111,7 @@ const UserList = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data?.users.map((user: User) => (
+          {users.map((user: User) => (
             <UserListRow
               key={user.id}
               user={user}

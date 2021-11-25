@@ -10,12 +10,11 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
-import { useMutation } from '@apollo/client';
+import useMutationEx from 'hooks/useMutationEx';
 import { GQL_ADMIN_CREATE_USERS } from 'utils/gql';
 
 const AdminUserCreate = () => {
-  const [createUser] = useMutation(GQL_ADMIN_CREATE_USERS);
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -24,22 +23,23 @@ const AdminUserCreate = () => {
     getValues,
   } = useForm();
 
-  const navigate = useNavigate();
+  const [createUser] = useMutationEx(GQL_ADMIN_CREATE_USERS, {
+    onCompleted: () => {
+      navigate('/admin', {
+        state: { message: '新規ユーザーを作成しました' },
+      });
+    },
+    onError: () => {
+      setError('name', {
+        type: 'manual',
+        message: 'このユーザー名は既に使われております',
+      });
+    },
+  });
 
   const handleAction = (data) => {
     console.log({ ...data });
-    createUser({ variables: { ...data } })
-      .then(() => {
-        navigate('/admin', {
-          state: { message: '新規ユーザーを作成しました' },
-        });
-      })
-      .catch(() => {
-        setError('name', {
-          type: 'manual',
-          message: 'このユーザー名は既に使われております',
-        });
-      });
+    createUser({ variables: { ...data } });
   };
 
   return (

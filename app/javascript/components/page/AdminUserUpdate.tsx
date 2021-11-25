@@ -1,5 +1,4 @@
-import React, { useContext, useEffect } from 'react';
-import { UtilContext } from 'utils/contexts';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
@@ -12,11 +11,11 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
-import { useQuery, useMutation } from '@apollo/client';
+import useQueryEx from 'hooks/useQueryEx';
+import useMutationEx from 'hooks/useMutationEx';
 import { GQL_USER, GQL_ADMIN_UPDATE_USER } from 'utils/gql';
 
 const AdminUserUpdate = () => {
-  const { util } = useContext(UtilContext);
   const navigate = useNavigate();
   const params = useParams();
   const {
@@ -27,37 +26,27 @@ const AdminUserUpdate = () => {
     getValues,
   } = useForm();
 
-  const { loading, error, data } = useQuery(GQL_USER, {
-    variables: { id: params.id },
+  const { data } = useQueryEx(GQL_USER, { variables: { id: params.id } });
+  const [updateUser] = useMutationEx(GQL_ADMIN_UPDATE_USER, {
+    onCompleted: () => {
+      navigate('/admin', {
+        state: { message: 'ユーザー情報を更新しました' },
+      });
+    },
+    onError: () => {
+      setError('name', {
+        type: 'manual',
+        message: 'このユーザー名は既に使われております',
+      });
+    },
   });
-  const [updateUser] = useMutation(GQL_ADMIN_UPDATE_USER);
 
   const handleAction = (data) => {
     const inputs = Object.fromEntries(
-      Object.entries(data).filter(([, val]) => val)
-    ); // 入力していない値を取り除く
-    updateUser({ variables: { id: params.id, ...inputs } })
-      .then(() => {
-        navigate('/admin', {
-          state: { message: 'ユーザー情報を更新しました' },
-        });
-      })
-      .catch(() => {
-        setError('name', {
-          type: 'manual',
-          message: 'このユーザー名は既に使われております',
-        });
-      });
-  };
-
-  useEffect(() => util.setBackdrop(loading), [loading]);
-  useEffect(() => {
-    if (!error) return;
-    console.error(error);
-    alert(
-      '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+      Object.entries(data).filter(([, val]) => val) // 入力していない値を取り除く
     );
-  }, [error]);
+    updateUser({ variables: { id: params.id, ...inputs } });
+  };
 
   return (
     <AdminLayout>
@@ -74,7 +63,7 @@ const AdminUserUpdate = () => {
           <Typography component="h1" variant="h5">
             ユーザー情報更新
           </Typography>
-          {data && (
+          {data.user && (
             <Box
               component="form"
               noValidate
