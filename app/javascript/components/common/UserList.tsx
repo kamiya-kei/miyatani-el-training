@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { UtilContext } from 'utils/contexts';
+import { useNavigate } from 'react-router-dom';
+import { UtilContext, UserContext } from 'utils/contexts';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -108,12 +109,21 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
 };
 
 const UserList = () => {
+  const navigate = useNavigate();
   const { util } = useContext(UtilContext);
+  const { user } = useContext(UserContext);
+  const [isDeleteSelf, setIsDeleteSelf] = useState(false);
 
   const { data, refetch } = useQueryEx(GQL_USERS);
   const users: User[] = data.users || [];
   const [deleteUser] = useMutationEx(GQL_ADMIN_DELETE_USER, {
     onCompleted: () => {
+      if (isDeleteSelf) {
+        navigate('/', {
+          state: { message: 'アカウントを削除し、ログアウトしました。' },
+        });
+        return;
+      }
       util.flashMessage('ユーザーを削除しました');
       refetch();
     },
@@ -126,7 +136,12 @@ const UserList = () => {
   });
 
   const handleDeleteUser = async (id) => {
-    const is_agree = await util.confirmDialog();
+    const isDeleteSelf = user.id === id;
+    setIsDeleteSelf(isDeleteSelf);
+    const message = isDeleteSelf
+      ? '現在ログイン中のユーザーを削除しますか？削除後自動的にログアウトします'
+      : '本当にこのユーザーを削除しますか？';
+    const is_agree = await util.confirmDialog(message);
     if (is_agree) deleteUser({ variables: { id } });
   };
 
