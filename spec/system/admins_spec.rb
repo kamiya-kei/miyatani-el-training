@@ -38,7 +38,13 @@ RSpec.describe '管理者ページ', type: :system do
         page
       }
       let(:new_user) { FactoryBot.build(:user) }
-      it { expect { subject }.to change { User.count }.from(1).to(2) }
+      it {
+        expect {
+          subject
+          sleep 1
+        }.to change { User.count }.from(1).to(2)
+      }
+
       it { is_expected.to have_current_path('/admin') }
       it { is_expected.to have_content('新規ユーザーを作成しました') }
       it { is_expected.to have_content(new_user.name) }
