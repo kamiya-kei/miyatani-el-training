@@ -12,22 +12,25 @@ module Resolvers
     argument :page,      Int,     required: false
     argument :user_id,   ID,      required: false
 
-    def resolve(user_id: nil, page: 1, **args)
+    def resolve(**args)
       user = context[:session][:user]
       return if user.nil?
 
-      tasks = if user_id.nil?
-                Task.where(user_id: user['id'])
-              else
-                # TODO: 管理者権限の確認
-                Task.where(user_id: user_id)
-              end
+      # TODO: 管理者権限の確認
 
-      tasks = if args.empty?
-                tasks.order(created_at: 'DESC')
-              else
-                tasks.search(**args.slice(:word, :target, :done_ids, :sort_type, :is_asc))
-              end
+      user_id = args.fetch(:user_id, user['id'])
+      search_params = {
+        word: args.fetch(:word, ''),
+        target: args.fetch(:target, 'all'),
+        done_ids: args.fetch(:done_ids, [-1, 0, 1]),
+        sort_type: args.fetch(:sort_type, 'created_at'),
+        is_asc: args.fetch(:is_asc, false)
+      }
+      page = args.fetch(:page, 1)
+
+      tasks = Task.
+                where(user_id: user_id).
+                search(**search_params)
       count = tasks.count
       {
         tasks: tasks.page(page).per(PER_PAGE),
