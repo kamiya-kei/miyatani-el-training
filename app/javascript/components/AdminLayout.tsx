@@ -12,7 +12,12 @@ import Container from '@mui/material/Container';
 import MuiLink from '@mui/material/Link';
 import HeaderMenu from 'common/HeaderMenu';
 
-const AdminLayout = (props: { children: React.ReactNode }) => {
+interface AdminLayoutProps {
+  children: React.ReactNode;
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+}
+
+const AdminLayout = (props: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
@@ -48,7 +53,7 @@ const AdminLayout = (props: { children: React.ReactNode }) => {
       </AppBar>
       <Container
         disableGutters
-        maxWidth="sm"
+        maxWidth={props.maxWidth || 'md'}
         component="main"
         sx={{ pt: 8, pb: 6 }}
       >

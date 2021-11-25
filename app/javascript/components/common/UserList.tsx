@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import RoleForm from 'common/RoleForm';
 
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -18,7 +19,11 @@ import { DATETIME_FORMAT } from 'utils/constants';
 import { User } from 'utils/types';
 import useQueryEx from 'hooks/useQueryEx';
 import useMutationEx from 'hooks/useMutationEx';
-import { GQL_USERS, GQL_ADMIN_DELETE_USER } from 'utils/gql';
+import {
+  GQL_USERS,
+  GQL_ADMIN_DELETE_USER,
+  GQL_ADMIN_UPDATE_USER,
+} from 'utils/gql';
 
 interface UserListRowProps {
   user: User;
@@ -26,6 +31,8 @@ interface UserListRowProps {
 }
 
 const UserListRow = ({ user, onDelete }: UserListRowProps) => {
+  const { util } = useContext(UtilContext);
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,12 +45,24 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
     onDelete(id);
   };
 
+  const [updateUser] = useMutationEx(GQL_ADMIN_UPDATE_USER, {
+    onCompleted: () => {
+      util.flashMessage('ユーザータイプを変更しました');
+    },
+  });
+  const handleChangeUserRole = (roleId) => {
+    updateUser({ variables: { id: user.id, roleId } });
+  };
+
   return (
     <TableRow data-test-user={user.id}>
       <TableCell component="th" scope="row">
         {user.id}
       </TableCell>
       <TableCell align="left">{user.name}</TableCell>
+      <TableCell align="left">
+        <RoleForm defaultValue={user.role.id} onChange={handleChangeUserRole} />
+      </TableCell>
       <TableCell align="right">{user.tasksCount}</TableCell>
       <TableCell>{dayjs(user.createdAt).format(DATETIME_FORMAT)}</TableCell>
       <TableCell>
@@ -105,6 +124,7 @@ const UserList = () => {
           <TableRow>
             <TableCell>ID</TableCell>
             <TableCell>ユーザー名</TableCell>
+            <TableCell>ユーザータイプ</TableCell>
             <TableCell>タスク数</TableCell>
             <TableCell>登録日時</TableCell>
             <TableCell>メニュー</TableCell>
