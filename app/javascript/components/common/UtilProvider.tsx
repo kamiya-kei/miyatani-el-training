@@ -13,7 +13,8 @@ const UtilProvider = (props: { children: React.ReactNode }) => {
   const util = {
     flashMessage: (message, severity = null) =>
       flashMessageRef.current.showMessage(message, severity),
-    confirmDialog: async () => await confirmDialogRef.current.confirm(),
+    confirmDialog: async (message) =>
+      await confirmDialogRef.current.confirm(message),
     setBackdrop: (loading: boolean) => setIsLoading(loading),
   };
 
