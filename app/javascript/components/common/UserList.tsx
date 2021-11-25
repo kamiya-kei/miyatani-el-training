@@ -117,6 +117,12 @@ const UserList = () => {
       util.flashMessage('ユーザーを削除しました');
       refetch();
     },
+    onError: () => {
+      util.flashMessage(
+        'ユーザーを削除できませんでした。管理ユーザーは最低1人は必要です',
+        'error'
+      );
+    },
   });
 
   const handleDeleteUser = async (id) => {
