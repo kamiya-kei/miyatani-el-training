@@ -8,7 +8,7 @@ module Mutations
 
     def resolve(**args)
       user = User.create!(args)
-      context[:session][:user] = user
+      context[:user] = user
       {
         user: user
       }

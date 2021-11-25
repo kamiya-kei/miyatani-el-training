@@ -9,7 +9,7 @@ module Mutations
     argument :role_id,               ID,     required: false
 
     def resolve(id:, **args)
-      user = context[:session][:user]
+      user = context[:user]
       return if user.nil? # TODO: 管理者権限の確認
 
       target_user = User.find(id)

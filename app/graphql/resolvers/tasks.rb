@@ -13,7 +13,7 @@ module Resolvers
     argument :user_id,   ID,      required: false
 
     def resolve(user_id: nil, page: 1, **args)
-      user = context[:session][:user]
+      user = context[:user]
       return if user.nil?
 
       tasks = if user_id.nil?

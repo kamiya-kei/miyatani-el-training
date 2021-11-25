@@ -9,7 +9,8 @@ class GraphqlController < ApplicationController
     query = params[:query]
     operation_name = params[:operationName]
     context = {
-      session: session
+      session: session,
+      user: session[:user_id] ? User.find(session[:user_id]) : nil
     }
     result = MiyataniElTrainingSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result

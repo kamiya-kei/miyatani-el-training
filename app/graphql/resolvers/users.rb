@@ -3,7 +3,7 @@ module Resolvers
     type [Types::UserType], null: false
 
     def resolve
-      user = User.find(context[:session][:user]['id'])
+      user = context[:user]
       return if user.nil? # TODO: 管理者権限の確認
 
       User.includes(:tasks).order(created_at: 'DESC')

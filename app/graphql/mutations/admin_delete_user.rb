@@ -5,7 +5,7 @@ module Mutations
     argument :id, ID, required: true
 
     def resolve(id:)
-      user = context[:session][:user]
+      user = context[:user]
       return if user.nil? # TODO: 管理者権限の確認
 
       target_user = User.find(id)

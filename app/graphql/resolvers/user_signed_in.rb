@@ -3,7 +3,7 @@ module Resolvers
     type Types::UserType, null: true
 
     def resolve
-      context[:session][:user]
+      context[:user]
     end
   end
 end

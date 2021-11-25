@@ -5,7 +5,7 @@ module Mutations
     argument :id, ID, required: true
 
     def resolve(id: nil)
-      user = context[:session][:user]
+      user = context[:user]
       return if user.nil?
 
       task = Task.where(user_id: user['id']).find(id)
