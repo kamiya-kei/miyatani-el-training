@@ -17,7 +17,7 @@ module Types
     end
     def user(id:)
       user = User.find(context[:session][:user]['id'])
-      return if user.nil? # TODO: 管理者権限の確認
+      # TODO: 管理者権限の確認
 
       User.find(id)
     end
