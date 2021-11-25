@@ -5,6 +5,7 @@ module Mutations
     argument :name,                  String, required: true
     argument :password,              String, required: true
     argument :password_confirmation, String, required: true
+    argument :role_id,               ID,     required: true
 
     def resolve(**args)
       user = context[:session][:user]
