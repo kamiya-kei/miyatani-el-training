@@ -45,9 +45,12 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
     onDelete(id);
   };
 
-  const [updateUser] = useMutationEx(GQL_ADMIN_UPDATE_USER, {
+  const [updateUser, { error }] = useMutationEx(GQL_ADMIN_UPDATE_USER, {
     onCompleted: () => {
       util.flashMessage('ユーザータイプを変更しました');
+    },
+    onError: () => {
+      util.flashMessage('ユーザータイプを変更できませんでした', 'error');
     },
   });
   const handleChangeUserRole = (roleId) => {
@@ -61,7 +64,11 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
       </TableCell>
       <TableCell align="left">{user.name}</TableCell>
       <TableCell align="left">
-        <RoleForm defaultValue={user.role.id} onChange={handleChangeUserRole} />
+        <RoleForm
+          defaultValue={user.role.id}
+          onChange={handleChangeUserRole}
+          error={!!error}
+        />
       </TableCell>
       <TableCell align="right">{user.tasksCount}</TableCell>
       <TableCell>{dayjs(user.createdAt).format(DATETIME_FORMAT)}</TableCell>
