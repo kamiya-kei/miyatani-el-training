@@ -6,10 +6,15 @@ module Mutations
 
     def resolve(id:)
       user = context[:user]
-      return if user.nil? # TODO: 管理者権限の確認
+      unless user.role.id == Role::ADMIN
+        raise GraphQL::ExecutionError, 'admin only'
+      end
 
       target_user = User.find(id)
       target_user.destroy!
+      if id == user.id
+        context[:session][:user_id] = nil # 自分ならアカウント削除後サインアウト
+      end
       {
         user: target_user
       }

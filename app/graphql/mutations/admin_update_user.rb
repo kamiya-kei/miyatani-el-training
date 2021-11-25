@@ -11,7 +11,9 @@ module Mutations
 
     def resolve(id:, **args)
       user = context[:user]
-      return if user.nil? # TODO: 管理者権限の確認
+      unless user.role.id == Role::ADMIN
+        raise GraphQL::ExecutionError, 'admin only'
+      end
 
       target_user = User.find(id)
       target_user.update!(args)
@@ -19,7 +21,7 @@ module Mutations
         user: target_user
       }
     rescue => e
-      raise GraphQL::ExecutionError.new(e.message)
+      raise GraphQL::ExecutionError, e.message
     end
   end
 end

@@ -17,7 +17,9 @@ module Types
     end
     def user(id:)
       user = context[:user]
-      return if user.nil? # TODO: 管理者権限の確認
+      unless user.role.id == Role::ADMIN
+        raise GraphQL::ExecutionError, 'admin only'
+      end
 
       User.find(id)
     end

@@ -9,7 +9,9 @@ module Mutations
 
     def resolve(**args)
       user = context[:user]
-      return if user.nil? # TODO: 管理者権限の確認
+      unless user.role.id == Role::ADMIN
+        raise GraphQL::ExecutionError, 'admin only'
+      end
 
       target_user = User.create!(args)
       {
