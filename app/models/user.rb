@@ -1,11 +1,9 @@
 class User < ApplicationRecord
-  before_destroy :admin_check
-  before_update :admin_check, if: :admin_check_required?
-
-  # 課題の指定の為、deviseを使用していません
-  attr_accessor :password, :password_confirmation
-
   after_validation :set_encrypted_password
+  before_update :admin_check, if: :admin_check_required?
+  before_destroy :admin_check
+
+  attr_accessor :password, :password_confirmation
 
   has_many :tasks, dependent: :destroy
   extend ActiveHash::Associations::ActiveRecordExtensions
@@ -35,13 +33,15 @@ class User < ApplicationRecord
 
   def compare_password(secret)
     new_encrypted_password = BCrypt::Password.new(self.encrypted_password)
-    self.encrypted_password = new_encrypted_password # 比較の度にハッシュ値を更新
+    self.update(encrypted_password: new_encrypted_password) # 比較の度にハッシュ値を更新
     self.encrypted_password == BCrypt::Engine.hash_secret(secret, new_encrypted_password.salt)
   end
 
   private
 
   def set_encrypted_password
+    return if password.blank? # パスワードが設定されていなければ更新しない
+
     self.encrypted_password = BCrypt::Password.create(password)
   end
 
@@ -52,9 +52,8 @@ class User < ApplicationRecord
 
   def admin_check
     # 変更・削除しようとしているユーザー以外に管理ユーザーがいなければエラー
-    unless User.where.not(id: self.id)
-        .where(role_id: Role::ADMIN)
-        .exists?
+    unless User.where.not(id: self.id).
+             exists?(role_id: Role::ADMIN)
       throw(:abort)
     end
   end
