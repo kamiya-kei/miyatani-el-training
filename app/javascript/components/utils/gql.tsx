@@ -120,6 +120,10 @@ const USER_FRAGMENT = gql`
   fragment UserFragment on User {
     id
     name
+    role {
+      id
+      text
+    }
     createdAt
   }
 `;
@@ -214,12 +218,14 @@ export const GQL_ADMIN_CREATE_USERS = gql`
     $name: String!
     $password: String!
     $passwordConfirmation: String!
+    $roleId: ID!
   ) {
     adminCreateUser(
       input: {
         name: $name
         password: $password
         passwordConfirmation: $passwordConfirmation
+        roleId: $roleId
       }
     ) {
       user {
@@ -236,6 +242,7 @@ export const GQL_ADMIN_UPDATE_USER = gql`
     $name: String
     $password: String
     $passwordConfirmation: String
+    $roleId: ID
   ) {
     adminUpdateUser(
       input: {
@@ -243,6 +250,7 @@ export const GQL_ADMIN_UPDATE_USER = gql`
         name: $name
         password: $password
         passwordConfirmation: $passwordConfirmation
+        roleId: $roleId
       }
     ) {
       user {

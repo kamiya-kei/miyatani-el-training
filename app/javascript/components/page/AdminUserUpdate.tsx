@@ -10,7 +10,9 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import RoleForm from 'common/RoleForm';
 
+import { User } from 'utils/types';
 import useQueryEx from 'hooks/useQueryEx';
 import useMutationEx from 'hooks/useMutationEx';
 import { GQL_USER, GQL_ADMIN_UPDATE_USER } from 'utils/gql';
@@ -24,9 +26,11 @@ const AdminUserUpdate = () => {
     formState: { errors },
     setError,
     getValues,
+    setValue,
   } = useForm();
 
   const { data } = useQueryEx(GQL_USER, { variables: { id: params.id } });
+  const user = (data.user || null) as User;
   const [updateUser] = useMutationEx(GQL_ADMIN_UPDATE_USER, {
     onCompleted: () => {
       navigate('/admin', {
@@ -63,7 +67,7 @@ const AdminUserUpdate = () => {
           <Typography component="h1" variant="h5">
             ユーザー情報更新
           </Typography>
-          {data.user && (
+          {user && (
             <Box
               component="form"
               noValidate
@@ -78,7 +82,7 @@ const AdminUserUpdate = () => {
                     label="ユーザー名"
                     name="name"
                     autoComplete="username"
-                    defaultValue={data.user.name}
+                    defaultValue={user.name}
                     {...register('name')}
                     error={!!errors.name}
                     helperText={errors.name?.message}
@@ -132,6 +136,9 @@ const AdminUserUpdate = () => {
                     error={!!errors.passwordConfirmation}
                     helperText={errors.passwordConfirmation?.message}
                   />
+                </Grid>
+                <Grid item xs={12}>
+                  <RoleForm defaultValue={user.role.id} setValue={setValue} />
                 </Grid>
               </Grid>
               <Button
