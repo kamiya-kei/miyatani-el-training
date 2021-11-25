@@ -16,7 +16,7 @@ module Types
       argument :id, ID, required: true
     end
     def user(id:)
-      user = User.find(context[:session][:user]['id'])
+      User.find(context[:session][:user]['id'])
       # TODO: 管理者権限の確認
 
       User.find(id)
