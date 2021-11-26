@@ -27,6 +27,7 @@ const AdminUserUpdate = () => {
     setError,
     getValues,
     setValue,
+    clearErrors,
   } = useForm();
 
   const { data } = useQueryEx(GQL_USER, { variables: { id: params.id } });
@@ -38,16 +39,19 @@ const AdminUserUpdate = () => {
       });
     },
     onError: (res) => {
-      if (
-        res.graphQLErrors
-          .map((v) => v.message)
-          .includes('Failed to save the record')
-      ) {
+      const result = res.networkError.result;
+      const error_messages = result.errors.map((v) => v.message);
+      if (error_messages.includes('Failed to save the record')) {
         setError('roleId', {
           type: 'manual',
           message: '管理ユーザーが最低1人は必要です',
         });
-      } else {
+      }
+      if (
+        error_messages.includes(
+          'Validation failed: Name has already been taken'
+        )
+      ) {
         setError('name', {
           type: 'manual',
           message: 'このユーザー名は既に使われております',
@@ -60,6 +64,7 @@ const AdminUserUpdate = () => {
     const inputs = Object.fromEntries(
       Object.entries(data).filter(([, val]) => val) // 入力していない値を取り除く
     );
+    console.log(data);
     updateUser({ variables: { id: params.id, ...inputs } });
   };
 
@@ -153,6 +158,7 @@ const AdminUserUpdate = () => {
                     defaultValue={user.role.id}
                     setValue={setValue}
                     error={!!errors.roleId}
+                    clearErrors={clearErrors}
                   />
                 </Grid>
               </Grid>
