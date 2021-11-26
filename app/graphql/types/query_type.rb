@@ -18,7 +18,7 @@ module Types
     def user(id:)
       user = context[:user]
       unless user.role.id == Role::ADMIN
-        raise GraphQL::ExecutionError, 'admin only'
+        raise GraphqlController::AdminAuthorizationError
       end
 
       User.find(id)

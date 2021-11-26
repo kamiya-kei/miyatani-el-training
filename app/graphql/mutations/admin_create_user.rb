@@ -10,7 +10,7 @@ module Mutations
     def resolve(**args)
       user = context[:user]
       unless user.role.id == Role::ADMIN
-        raise GraphQL::ExecutionError, 'admin only'
+        raise GraphqlController::AdminAuthorizationError
       end
 
       target_user = User.create!(args)

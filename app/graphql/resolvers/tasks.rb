@@ -15,7 +15,7 @@ module Resolvers
     def resolve(user_id: nil, **args)
       user = context[:user]
       if user_id.present? && user.role.id != Role::ADMIN
-        raise GraphQL::ExecutionError, 'admin only'
+        raise GraphqlController::AdminAuthorizationError
       end
 
       target_user_id = user_id || user.id # ユーザーを指定していなければログイン中のユーザーのデータを取得

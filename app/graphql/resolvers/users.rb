@@ -5,7 +5,7 @@ module Resolvers
     def resolve
       user = context[:user]
       unless user.role.id == Role::ADMIN
-        raise GraphQL::ExecutionError, 'admin only'
+        raise GraphqlController::AdminAuthorizationError
       end
 
       User.includes(:tasks).order(created_at: 'DESC')
