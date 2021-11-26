@@ -2,7 +2,7 @@ module Mutations
   class DeleteLabel < BaseMutation
     field :label, Types::LabelType, null: true
 
-    argument :id,   ID,     required: true
+    argument :id, ID, required: true
 
     def resolve(id:)
       user = context[:user]

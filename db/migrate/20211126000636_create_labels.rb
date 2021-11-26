@@ -5,6 +5,6 @@ class CreateLabels < ActiveRecord::Migration[6.1]
       t.references :user, null: false, foreign_key: true
       t.timestamps
     end
-    add_index :labels, [:user_id, :name], unique: true
+    add_index :labels, %i(user_id name), unique: true
   end
 end
