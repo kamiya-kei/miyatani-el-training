@@ -11,5 +11,6 @@ module Types
     def tasks_count
       object.tasks.size
     end
+    field :labels, [Types::LabelType], null: false
   end
 end
