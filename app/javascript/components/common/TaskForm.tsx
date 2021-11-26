@@ -14,6 +14,7 @@ import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
 import { Grid } from '@mui/material';
 import { Task } from 'utils/types';
+import LabelForm from 'common/LabelForm';
 
 export type Inputs = {
   title: string;
@@ -57,6 +58,9 @@ const TaskForm = (props: TaskFormProps) => {
               error={!!errors.title}
               helperText={errors.title && 'タイトルを入力してください'}
             />
+          </FormItem>
+          <FormItem>
+            <LabelForm setValue={setValue} defaultValue={[]} />
           </FormItem>
           <FormItem>
             <TextField
