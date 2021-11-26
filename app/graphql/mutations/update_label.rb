@@ -1,6 +1,6 @@
 module Mutations
   class UpdateLabel < BaseMutation
-    field :label, Types::LabelType, null: true
+    field :labels, [Types::LabelType], null: true
 
     argument :id,   ID,     required: true
     argument :name, String, required: true
@@ -11,7 +11,7 @@ module Mutations
 
       label = user.labels.find(id)
       label.update!(name: name)
-      { label: label }
+      { labels: user.labels.order(name: 'ASC') }
     end
   end
 end

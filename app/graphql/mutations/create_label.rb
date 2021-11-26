@@ -1,6 +1,6 @@
 module Mutations
   class CreateLabel < BaseMutation
-    field :label, Types::LabelType, null: true
+    field :labels, [Types::LabelType], null: true
 
     argument :name, String, required: true
 
@@ -8,8 +8,8 @@ module Mutations
       user = context[:user]
       return if user.nil?
 
-      label = user.labels.create(name: name)
-      { label: label }
+      user.labels.create(name: name)
+      { labels: user.labels.order(name: 'ASC') }
     end
   end
 end

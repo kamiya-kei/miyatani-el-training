@@ -1,6 +1,6 @@
 module Mutations
   class DeleteLabel < BaseMutation
-    field :label, Types::LabelType, null: true
+    field :labels, [Types::LabelType], null: true
 
     argument :id, ID, required: true
 
@@ -10,7 +10,7 @@ module Mutations
 
       label = user.labels.find(id)
       label.destroy!
-      { label: label }
+      { labels: user.labels.order(name: 'ASC') }
     end
   end
 end
