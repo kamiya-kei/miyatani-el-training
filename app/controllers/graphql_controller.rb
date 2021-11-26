@@ -11,11 +11,10 @@ class GraphqlController < ApplicationController
     }
     result = MiyataniElTrainingSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
-
   rescue AdminAuthorizationError
-    render json: { error: { message: 'Admin Authorization Error' } }, status: 403
+    render json: { error: { message: 'Admin Authorization Error' } }, status: :forbidden
   rescue => e
-    render json: { errors: [{ message: e.message }], data: {} }, status: 400
+    render json: { errors: [{ message: e.message }], data: {} }, status: :bad_request
   end
 
   private

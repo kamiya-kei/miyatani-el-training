@@ -20,8 +20,6 @@ module Mutations
       {
         user: target_user
       }
-    # rescue => e
-    #   raise GraphQL::ExecutionError, e.message
     end
   end
 end
