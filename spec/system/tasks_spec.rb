@@ -23,7 +23,13 @@ RSpec.describe 'Tasks', type: :system do
         click_button '投稿'
         page
       }
-      it { expect { subject }.to change { Task.count }.from(0).to(1) }
+      it {
+        expect {
+          subject
+          sleep 1
+        }.to change { Task.count }.from(0).to(1)
+      }
+
       it { is_expected.to have_current_path('/') }
       it { is_expected.to have_content('タスクを投稿しました') }
 
@@ -41,7 +47,13 @@ RSpec.describe 'Tasks', type: :system do
         click_button '投稿'
       }
       it { is_expected.to have_no_content('タイトルを入力してください') }
-      it { expect { subject }.not_to(change { Task.count }) }
+
+      it {
+        expect {
+          subject
+          sleep 1
+        }.not_to(change { Task.count })
+      }
     end
 
     describe '入力するがキャンセル' do
@@ -53,7 +65,12 @@ RSpec.describe 'Tasks', type: :system do
         click_link 'キャンセル'
         page
       }
-      it { expect { subject }.not_to(change { Task.count }) }
+      it {
+        expect {
+          subject
+          sleep 1
+        }.not_to(change { Task.count })
+      }
 
       it '投稿されたタスクがタスク一覧に表示されている' do
         subject
@@ -92,7 +109,13 @@ RSpec.describe 'Tasks', type: :system do
         click_button '更新'
         page
       }
-      it { expect { subject }.not_to(change { Task.count }) }
+      it {
+        expect {
+          subject
+          sleep 1
+        }.not_to(change { Task.count })
+      }
+
       it { is_expected.to have_current_path('/') }
       it { is_expected.to have_content('タスクを更新しました') }
 
@@ -118,7 +141,13 @@ RSpec.describe 'Tasks', type: :system do
         click_link 'キャンセル'
         page
       }
-      it { expect { subject }.not_to(change { Task.count }) }
+      it {
+        expect {
+          subject
+          sleep 1
+        }.not_to(change { Task.count })
+      }
+
       it { is_expected.to have_current_path('/') }
 
       it 'タスク一覧のタスクが更新されていない' do
