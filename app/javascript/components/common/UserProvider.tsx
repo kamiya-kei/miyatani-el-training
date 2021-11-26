@@ -6,7 +6,6 @@ import { GQL_USER_SIGNED_IN } from 'utils/gql';
 const UserProvider = (props: { children: React.ReactNode }) => {
   const [user, setUserData] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
-  const [loadingUser, setLoadingUser] = useState(true);
 
   const setUser = (user) => {
     setUserData(user);
@@ -23,12 +22,11 @@ const UserProvider = (props: { children: React.ReactNode }) => {
         return;
       }
       setUser(data.userSignedIn);
-      setLoadingUser(false);
     });
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser, isLogin, loadingUser }}>
+    <UserContext.Provider value={{ user, setUser, isLogin }}>
       {props.children}
     </UserContext.Provider>
   );

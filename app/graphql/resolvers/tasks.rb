@@ -10,27 +10,17 @@ module Resolvers
     argument :is_asc,    Boolean, required: false
     argument :target,    String,  required: false
     argument :page,      Int,     required: false
-    argument :user_id,   ID,      required: false
 
-    def resolve(**args)
+    def resolve(page: 1, **args)
       user = context[:session][:user]
       return if user.nil?
 
-      # TODO: 管理者権限の確認
-
-      user_id = args.fetch(:user_id, user['id'])
-      search_params = {
-        word: args.fetch(:word, ''),
-        target: args.fetch(:target, 'all'),
-        done_ids: args.fetch(:done_ids, [-1, 0, 1]),
-        sort_type: args.fetch(:sort_type, 'created_at'),
-        is_asc: args.fetch(:is_asc, false)
-      }
-      page = args.fetch(:page, 1)
-
-      tasks = Task.
-                where(user_id: user_id).
-                search(**search_params)
+      tasks = Task.where(user_id: user['id'])
+      tasks = if args.empty?
+                tasks.order(created_at: 'DESC')
+              else
+                tasks.search(**args.slice(:word, :target, :done_ids, :sort_type, :is_asc))
+              end
       count = tasks.count
       {
         tasks: tasks.page(page).per(PER_PAGE),
