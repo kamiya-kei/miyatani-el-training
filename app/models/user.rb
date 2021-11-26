@@ -6,6 +6,7 @@ class User < ApplicationRecord
   attr_accessor :password, :password_confirmation
 
   has_many :tasks, dependent: :destroy
+  has_many :labels, dependent: :destroy
   extend ActiveHash::Associations::ActiveRecordExtensions
   belongs_to :role
 
