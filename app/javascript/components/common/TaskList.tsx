@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { UtilContext } from 'utils/contexts';
 import { Link } from 'react-router-dom';
 import CardHeader from '@mui/material/CardHeader';
@@ -14,9 +14,17 @@ import SearchForm from 'common/SearchForm';
 import Priority from 'common/Priority';
 import DoneChip from 'common/DoneChip';
 import TasksPagination from 'common/TasksPagination';
+import LabelForm from 'common/LabelForm';
+
 import { DATETIME_FORMAT } from 'utils/constants';
 import { SortType, SearchTarget, Task } from 'utils/types';
-import { GQL_TASKS, GQL_DELETE_TASK } from 'utils/gql';
+import {
+  GQL_TASKS,
+  GQL_DELETE_TASK,
+  GQL_LABELS,
+  GQL_UPDATE_TASK,
+} from 'utils/gql';
+import { Label } from 'utils/types';
 import useQueryEx from 'hooks/useQueryEx';
 import useMutationEx from 'hooks/useMutationEx';
 
@@ -85,6 +93,24 @@ const TaskList = (props: TaskListProps) => {
     getTasks({ page });
   };
 
+  // ラベル ------------------------------------------------
+  const { data: data2 } = useQueryEx(GQL_LABELS, {
+    variables: { userId: props.userId },
+  });
+  const [labels, setLabels] = useState([] as Label[]);
+  useEffect(() => {
+    if (!data2.labels) return;
+    setLabels(data2.labels || []);
+  }, [data2]);
+  const [updateTask] = useMutationEx(GQL_UPDATE_TASK, {
+    onCompleted: () => {
+      util.flashMessage('ラベルを設定しました');
+    },
+  });
+  const handleUpdateLabel = (id) => (labelIds) => {
+    updateTask({ variables: { id, labelIds } });
+  };
+
   return (
     <>
       <Stack spacing={2} style={{ padding: '20px 0' }}>
@@ -124,18 +150,29 @@ const TaskList = (props: TaskListProps) => {
               </Box>
             }
             subheader={
-              <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div>
-                  作成日時:
-                  {dayjs(task.createdAt).format(DATETIME_FORMAT)}
-                </div>
-                <div>
-                  期限:
-                  {task.deadline
-                    ? dayjs(task.deadline).format(DATETIME_FORMAT)
-                    : '--'}
-                </div>
-              </Box>
+              <>
+                <Box
+                  style={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <div>
+                    作成日時:
+                    {dayjs(task.createdAt).format(DATETIME_FORMAT)}
+                  </div>
+                  <div>
+                    期限:
+                    {task.deadline
+                      ? dayjs(task.deadline).format(DATETIME_FORMAT)
+                      : '--'}
+                  </div>
+                </Box>
+                <LabelForm
+                  defaultValue={task.labels.map((v) => v.id)}
+                  labels={labels}
+                  setLabels={setLabels}
+                  onChange={handleUpdateLabel(task.id)}
+                  canEdit={!props.userId}
+                />
+              </>
             }
           />
           <CardContent>{task.description}</CardContent>

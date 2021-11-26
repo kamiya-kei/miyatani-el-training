@@ -26,21 +26,24 @@ import { Label } from 'utils/types';
 interface LabelFormProps {
   labels: Label[];
   defaultValue: Label['id'][];
-  setValue: UseFormSetValue<{ labelIds: Label['id'][] }>;
   setLabels: (labels: Label[]) => void;
+  setValue?: UseFormSetValue<{ labelIds: Label['id'][] }>;
+  onChange?: (labels: Label[]) => void;
+  canEdit?: boolean;
 }
 
 const LabelForm = (props: LabelFormProps) => {
   const { util } = useContext(UtilContext);
   const [open, setOpen] = useState(false);
 
+  const canEdit = props.canEdit !== false; // default: true
   // ---------------------------------------------------------
 
   const [labelIds, setLabelIds] = useState(props.defaultValue);
   const [newLabelIds, setNewLabelIds] = useState([]);
 
   useEffect(() => {
-    props.setValue('labelIds', labelIds);
+    props.setValue?.('labelIds', labelIds);
     console.log(props.labels, labelIds);
   }, []);
 
@@ -55,7 +58,8 @@ const LabelForm = (props: LabelFormProps) => {
   };
 
   const handleSetLabel = () => {
-    props.setValue('labelIds', newLabelIds);
+    props.setValue?.('labelIds', newLabelIds);
+    props.onChange?.(newLabelIds);
     setLabelIds(newLabelIds);
     setNewLabelIds([]);
     setOpen(false);
@@ -122,9 +126,11 @@ const LabelForm = (props: LabelFormProps) => {
   return (
     <>
       ラベル
-      <IconButton size="small" onClick={handleOpen}>
-        <EditIcon />
-      </IconButton>
+      {canEdit && (
+        <IconButton size="small" onClick={handleOpen}>
+          <EditIcon />
+        </IconButton>
+      )}
       ：
       {labelIds.map((labelId) => {
         const label = props.labels.find((label) => label.id == labelId);

@@ -288,8 +288,8 @@ const LABEL_FRAGMENT = gql`
 
 export const GQL_LABELS = gql`
   ${LABEL_FRAGMENT}
-  query labels {
-    labels {
+  query labels($userId: ID) {
+    labels(userId: $userId) {
       ...LabelFragment
     }
   }
