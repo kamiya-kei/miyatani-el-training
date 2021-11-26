@@ -14,7 +14,8 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import axios from 'module/axios_with_csrf';
+import { client } from 'common/MyApolloProvider';
+import { GQL_CREATE_USER } from 'utils/gql';
 
 const SignUp = () => {
   const {
@@ -26,47 +27,29 @@ const SignUp = () => {
   } = useForm();
 
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
+  const { setUser, isLogin } = useContext(UserContext);
 
   useEffect(() => {
-    if (!user.isLogin) return;
-    // 既にログイン済みの場合はトップへ飛ばす
-    navigate('/');
-  }, [user]);
+    if (isLogin) navigate('/'); // 既にログイン済みの場合はトップへ飛ばす
+  }, [isLogin]);
 
   const handleAction = (data) => {
-    axios
-      .post('/graphql', {
-        query: `
-        mutation {
-          createUser(
-            input: {
-              name: "${data.name}"
-              password: "${data.password}"
-              passwordConfirmation: "${data.passwordConfirmation}"
-            }
-          ) {
-            user {
-              id
-              name
-            }
-          }
-        }
-      `,
+    client
+      .mutate({
+        mutation: GQL_CREATE_USER,
+        variables: {
+          name: data.name,
+          password: data.password,
+          passwordConfirmation: data.passwordConfirmation,
+        },
       })
-      .then((res) => {
-        const user = res.data.data.createUser.user;
-        setUser({ user, isLogin: true });
+      .then(({ data }) => {
+        setUser(data.createUser.user);
         navigate('/');
       })
       .catch((error) => {
-        console.error(error.response);
-        const errors = error.response.data?.errors;
-        if (!errors) {
-          alert(
-            '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-          );
-        }
+        console.log(error);
+        console.log(error.message);
         setError('name', {
           type: 'manual',
           message: 'このユーザー名は既に使われております',

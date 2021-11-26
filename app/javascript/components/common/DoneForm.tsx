@@ -1,17 +1,24 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import { UseFormSetValue } from 'react-hook-form';
+import { Inputs } from 'common/TaskForm';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { Done } from 'utils/types';
 
-const DoneForm = (props) => {
+interface DoneFormProps {
+  defaultValue: Done['id'];
+  setValue: UseFormSetValue<Inputs>;
+}
+
+const DoneForm = (props: DoneFormProps) => {
   const [done, setDone] = useState(props.defaultValue);
 
   const handleChange = (event) => {
     setDone(event.target.value);
-    props.setValue('done_id', event.target.value);
+    props.setValue('doneId', event.target.value);
   };
 
   return (
@@ -31,11 +38,6 @@ const DoneForm = (props) => {
       </FormControl>
     </Box>
   );
-};
-
-DoneForm.propTypes = {
-  defaultValue: PropTypes.string,
-  setValue: PropTypes.func,
 };
 
 export default DoneForm;

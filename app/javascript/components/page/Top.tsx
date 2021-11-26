@@ -7,12 +7,11 @@ import CardActions from '@mui/material/CardActions';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
-import axios from 'module/axios_with_csrf';
 import dayjs from 'dayjs';
 import BaseLayout from 'BaseLayout';
 import TaskCard from 'common/TaskCard';
-import ConfirmDialog from 'common/ConfirmDialog';
-import FlashMessage from 'common/FlashMessage';
+import ConfirmDialog, { ConfirmDialogHandler } from 'common/ConfirmDialog';
+import FlashMessage, { FlashMessageHandler } from 'common/FlashMessage';
 import SortForm from 'common/SortForm';
 import SearchForm from 'common/SearchForm';
 import Priority from 'common/Priority';
@@ -21,76 +20,59 @@ import TasksPagination from 'common/TasksPagination';
 import { DATETIME_FORMAT } from 'utils/constants';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import { SortType, SearchTarget, Task } from 'utils/types';
+import { client } from 'common/MyApolloProvider';
+import { GQL_TASKS, GQL_DELETE_TASK } from 'utils/gql';
 
-const DEFAULT_SEARCH_PARAMETERS = {
+const DEFAULT_SEARCH_PARAMETERS: {
+  word: string;
+  target: SearchTarget;
+  doneIds: ('-1' | '0' | '1')[];
+  sortType: SortType;
+  isAsc: boolean;
+  page: number;
+} = {
   word: '',
   target: 'all',
   doneIds: ['-1', '0', '1'],
-  sortType: 'createdAt',
+  sortType: 'created_at',
   isAsc: false,
   page: 1,
 };
 
 const Top = () => {
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMETERS);
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([] as Task[]);
   const [maxPage, setMaxPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
   const { state } = useLocation();
-  const confirmDialogRef = useRef();
-  const flashMessageRef = useRef();
+  const confirmDialogRef = useRef({} as ConfirmDialogHandler);
+  const flashMessageRef = useRef({} as FlashMessageHandler);
 
   const getTasks = (newParams = {}) => {
     const allParams = { ...searchParams, ...newParams }; // 新しいパラメータを上書き
-    const { page, word, target, doneIds, sortType, isAsc } = allParams;
+    // const { page, word, target, doneIds, sortType, isAsc } = allParams;
     setSearchParams(allParams);
 
     setIsLoading(true);
-    axios
-      .post('/graphql', {
-        query: `
-        {
-          tasks(
-            page: ${page},
-            word: "${word}",
-            doneIds: [${doneIds}],
-            sortType: "${sortType}",
-            isAsc: ${isAsc},
-            target: "${target}"
-          ) {
-            tasks {
-              id
-              title
-              description
-              deadline
-              done {
-                id
-                text
-              }
-              priorityNumber
-              createdAt
-            }
-            count
-            maxPage
-          }
+    client
+      .query({
+        query: GQL_TASKS,
+        variables: allParams,
+      })
+      .then(({ data, error }) => {
+        if (error) {
+          alert(
+            '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+          );
+          console.error(error);
+          setIsLoading(false);
+          return;
         }
-      `,
-      })
-      .then((res) => {
-        const result = res.data.data.tasks;
-        setTasks(result.tasks);
-        setMaxPage(result.maxPage);
-      })
-      .catch((error) => {
-        alert(
-          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-        );
-        console.error(error);
-      })
-      .finally(() => {
-        // loadingが終わったことを認識できるように少しだけloadingを非表示にするまで遅延
-        setTimeout(() => setIsLoading(false), 100);
+        setTasks(data.tasks.tasks);
+        setMaxPage(data.tasks.maxPage);
+        setIsLoading(false);
       });
   };
 
@@ -99,46 +81,26 @@ const Top = () => {
   }, []);
 
   useEffect(() => {
-    if (!state) {
-      return;
-    }
+    if (!state) return;
+
     // タスク作成・編集画面から戻ってきた時にフラッシュメッセージを表示する
     flashMessageRef.current.showMessage(state.message);
   }, [state]);
 
   const handleDelete = async (id) => {
     const is_agree = await confirmDialogRef.current.confirm();
-    if (!is_agree) {
-      return;
-    }
+    if (!is_agree) return;
 
-    axios
-      .post('/graphql', {
-        query: `
-        mutation {
-          deleteTask(
-            input:{
-              id: ${id}
-            }
-          ){
-            task {
-              id
-            }
-          }
-        }
-      `,
+    client
+      .mutate({
+        mutation: GQL_DELETE_TASK,
+        variables: { id },
       })
       .then(() => {
         // 削除後、タスク一覧のデータを再取得して更新
         getTasks();
         // フラッシュメッセージ表示
         flashMessageRef.current.showMessage('タスクが削除されました');
-      })
-      .catch((error) => {
-        alert(
-          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-        );
-        console.error(error);
       });
   };
 

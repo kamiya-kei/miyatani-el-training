@@ -6,20 +6,32 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
+import { TransitionProps } from '@mui/material/transitions';
 
-const Transition = forwardRef((props, ref) => {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+const Transition = forwardRef(
+  (
+    props: TransitionProps & {
+      children: React.ReactElement<any, any>; // eslint-disable-line
+    },
+    ref: React.Ref<unknown>
+  ) => {
+    return <Slide direction="up" ref={ref} {...props} />;
+  }
+);
 Transition.displayName = 'Transition';
 
-const ConfirmDialog = forwardRef((props, ref) => {
+export interface ConfirmDialogHandler {
+  confirm: () => Promise<boolean>;
+}
+
+const ConfirmDialog = forwardRef<ConfirmDialogHandler>((props, ref) => {
   const [open, setOpen] = useState(false);
 
-  const [handleAgree, setHandleAgree] = useState(() => {});
-  const [handleDisagree, setHandleDisagree] = useState(() => {});
+  const [handleAgree, setHandleAgree] = useState(null);
+  const [handleDisagree, setHandleDisagree] = useState(null);
   const resetHandle = () => {
-    setHandleAgree(() => {});
-    setHandleDisagree(() => {});
+    setHandleAgree(null);
+    setHandleDisagree(null);
     setOpen(false);
   };
 

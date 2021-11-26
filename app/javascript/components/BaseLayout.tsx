@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
@@ -9,7 +8,7 @@ import Container from '@mui/material/Container';
 import MuiLink from '@mui/material/Link';
 import HeaderMenu from 'common/HeaderMenu';
 
-const BaseLayout = (props) => {
+const BaseLayout = (props: { children: React.ReactNode }) => {
   return (
     <>
       <CssBaseline />
@@ -33,10 +32,6 @@ const BaseLayout = (props) => {
       </Container>
     </>
   );
-};
-
-BaseLayout.propTypes = {
-  children: PropTypes.node,
 };
 
 export default BaseLayout;

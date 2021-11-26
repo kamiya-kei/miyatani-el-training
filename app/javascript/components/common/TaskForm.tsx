@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -14,14 +13,30 @@ import PriorityForm from 'common/PriorityForm';
 import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
 import { Grid } from '@mui/material';
+import { Task } from 'utils/types';
 
-const TaskForm = (props) => {
+export type Inputs = {
+  title: string;
+  description: string;
+  doneId: string;
+  priorityNumber: number;
+  deadline: string;
+};
+
+interface TaskFormProps {
+  title: string;
+  task: Task;
+  buttonText: string;
+  onAction: (data: object) => void;
+}
+
+const TaskForm = (props: TaskFormProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm();
+  } = useForm<Inputs>();
   const handleAction = (data) => {
     console.log(data);
     props.onAction(data);
@@ -58,8 +73,8 @@ const TaskForm = (props) => {
             <DeadLine
               register={register}
               setValue={setValue}
-              errors={errors}
-              defaultValue={props.task.deadline}
+              error={errors.deadline}
+              defaultValue={props.task.deadline || ''}
             />
           </FormItem>
           <FormItem>
@@ -67,7 +82,7 @@ const TaskForm = (props) => {
               <Grid item xs={6}>
                 <PriorityForm
                   setValue={setValue}
-                  defaultValue={props.task.priorityNumber || '0'}
+                  defaultValue={props.task.priorityNumber || 0}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -103,13 +118,6 @@ const TaskForm = (props) => {
       </TaskCard>
     </form>
   );
-};
-
-TaskForm.propTypes = {
-  title: PropTypes.string,
-  task: PropTypes.object,
-  buttonText: PropTypes.string,
-  onAction: PropTypes.func,
 };
 
 export default TaskForm;

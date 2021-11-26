@@ -1,10 +1,15 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import Pagination from '@mui/material/Pagination';
 import PaginationItem from '@mui/material/PaginationItem';
 
-const TasksPagination = (props) => {
-  const handleClick = (page) => () => {
+interface TaskPaginationProps {
+  onClick: (page: number) => void;
+  page: number;
+  maxPage: number;
+}
+
+const TasksPagination = (props: TaskPaginationProps) => {
+  const handleClick = (page: number) => () => {
     props.onClick(page);
 
     // ページ上部へスクロール
@@ -25,12 +30,6 @@ const TasksPagination = (props) => {
       />
     </>
   );
-};
-
-TasksPagination.propTypes = {
-  onClick: PropTypes.func,
-  page: PropTypes.number,
-  maxPage: PropTypes.number,
 };
 
 export default TasksPagination;

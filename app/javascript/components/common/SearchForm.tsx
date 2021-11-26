@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import PropTypes from 'prop-types';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -12,12 +11,15 @@ import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 
-const SearchForm = (props) => {
+interface SearchFormProps {
+  onSearch: ({ word, target, doneIds }) => void;
+}
+
+const SearchForm = (props: SearchFormProps) => {
   const formRef = useRef();
 
   const handleSubmit = () => {
     const formData = new FormData(formRef.current);
-    console.log([...formData.entries()]);
 
     props.onSearch({
       word: formData.get('word'),
@@ -36,9 +38,7 @@ const SearchForm = (props) => {
           inputProps={{ 'aria-label': 'search word' }}
           onKeyDown={(event) => {
             // フォーム内でEnter押下時にページ遷移しないようにする
-            if (event.code !== 'Enter') {
-              return;
-            }
+            if (event.code !== 'Enter') return;
             event.preventDefault();
             handleSubmit();
           }}
@@ -130,10 +130,6 @@ const SearchForm = (props) => {
       </FormControl>
     </Paper>
   );
-};
-
-SearchForm.propTypes = {
-  onSearch: PropTypes.func,
 };
 
 export default SearchForm;
