@@ -3,10 +3,7 @@ module Resolvers
     type [Types::UserType], null: false
 
     def resolve
-      User.find(context[:session][:user]['id'])
-      # TODO: 管理者権限の確認
-
-      User.includes(:tasks).order(created_at: 'DESC')
+      User.all
     end
   end
 end
