@@ -29,6 +29,7 @@ export const GQL_TASKS = gql`
     $sortType: String
     $isAsc: Boolean
     $target: String
+    $labelId: ID
   ) {
     tasks(
       userId: $userId
@@ -38,6 +39,7 @@ export const GQL_TASKS = gql`
       sortType: $sortType
       isAsc: $isAsc
       target: $target
+      labelId: $labelId
     ) {
       tasks {
         ...TaskFragment

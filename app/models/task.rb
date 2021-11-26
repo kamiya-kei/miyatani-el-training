@@ -17,11 +17,12 @@ class Task < ApplicationRecord
     )
   end
 
-  def self.search(word:, target:, done_ids:, sort_type:, is_asc:)
+  def self.search(word:, target:, done_ids:, sort_type:, is_asc:, label_id:)
     sort_key = sort_type.underscore # スネークケースに変換
     sort_val = is_asc ? 'ASC' : 'DESC'
     Task.
       filter_by_done_ids(done_ids).
+      filter_by_label(label_id).
       search_word("%#{word}%", target).
       order(sort_key => sort_val)
   end
@@ -43,5 +44,11 @@ class Task < ApplicationRecord
     return if done_ids.count == 3 # 全てのステータスの場合フィルタリング不要
 
     where(done_id: done_ids)
+  end
+
+  scope :filter_by_label, ->(label_id) do
+    return if label_id.blank? # 空の場合フィルタリング不要
+
+    where(id: TaskLabel.where(label_id: label_id).pluck(:task_id))
   end
 end

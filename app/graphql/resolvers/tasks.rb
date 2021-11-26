@@ -11,6 +11,7 @@ module Resolvers
     argument :target,    String,  required: false
     argument :page,      Int,     required: false
     argument :user_id,   ID,      required: false
+    argument :label_id,  ID,      required: false
 
     def resolve(user_id: nil, **args)
       user = context[:user]
@@ -38,7 +39,8 @@ module Resolvers
         target: args.fetch(:target, 'all'),
         done_ids: args.fetch(:done_ids, [-1, 0, 1]),
         sort_type: args.fetch(:sort_type, 'created_at'),
-        is_asc: args.fetch(:is_asc, false)
+        is_asc: args.fetch(:is_asc, false),
+        label_id: args.fetch(:label_id, nil)
       }
     end
   end

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -10,26 +10,52 @@ import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
-
+import { Button } from '@mui/material';
+import { Done } from 'utils/types';
 interface SearchFormProps {
   onSearch: ({ word, target, doneIds }) => void;
+  onReset: () => void;
+  word: string;
+  target: 'all' | 'title' | 'description';
+  doneIds: Done['id'][];
 }
 
 const SearchForm = (props: SearchFormProps) => {
-  const formRef = useRef();
+  const [formValues, setFormValues] = useState({
+    word: props.word,
+    target: props.target,
+    doneIds: props.doneIds,
+  });
+  const handleChangeWord = (event) => {
+    setFormValues({ ...formValues, word: event.target.value });
+  };
+  const handleChangeTarget = (event) => {
+    setFormValues({ ...formValues, target: event.target.value });
+  };
+  const handleChangeDoneIds = (event) => {
+    const ids = new Set(formValues.doneIds);
+    if (event.target.checked) {
+      ids.add(String(event.target.value) as Done['id']);
+    } else {
+      ids.delete(String(event.target.value) as Done['id']);
+    }
+    setFormValues({ ...formValues, doneIds: Array.from(ids) });
+  };
+  const handleReset = () => {
+    setFormValues({
+      word: '',
+      target: 'all',
+      doneIds: ['-1', '0', '1'],
+    });
+    props.onReset();
+  };
 
   const handleSubmit = () => {
-    const formData = new FormData(formRef.current);
-
-    props.onSearch({
-      word: formData.get('word'),
-      target: formData.get('target'),
-      doneIds: formData.getAll('done_ids[]'),
-    });
+    props.onSearch(formValues);
   };
 
   return (
-    <Paper component="form" ref={formRef} sx={{ p: '2px 4px' }}>
+    <Paper component="form" sx={{ p: '2px 4px' }}>
       <Paper sx={{ p: '2px 4px', display: 'flex', alignItems: 'center' }}>
         <InputBase
           name="word"
@@ -42,6 +68,8 @@ const SearchForm = (props: SearchFormProps) => {
             event.preventDefault();
             handleSubmit();
           }}
+          value={formValues.word}
+          onChange={handleChangeWord}
         />
         <IconButton
           id="search"
@@ -59,7 +87,8 @@ const SearchForm = (props: SearchFormProps) => {
           row
           aria-label="search-target"
           name="target"
-          defaultValue="all"
+          value={formValues.target}
+          onChange={handleChangeTarget}
         >
           <FormLabel
             component="legend"
@@ -90,6 +119,7 @@ const SearchForm = (props: SearchFormProps) => {
           <FormLabel
             component="legend"
             sx={{ display: 'flex', alignItems: 'center' }}
+            onChange={handleChangeDoneIds}
           >
             ステータス：
           </FormLabel>
@@ -98,8 +128,9 @@ const SearchForm = (props: SearchFormProps) => {
               <Checkbox
                 name="done_ids[]"
                 value="-1"
-                defaultChecked
+                checked={formValues.doneIds.includes('-1')}
                 size="small"
+                onChange={handleChangeDoneIds}
               />
             }
             label="未着手"
@@ -109,8 +140,9 @@ const SearchForm = (props: SearchFormProps) => {
               <Checkbox
                 name="done_ids[]"
                 value="0"
-                defaultChecked
+                checked={formValues.doneIds.includes('0')}
                 size="small"
+                onChange={handleChangeDoneIds}
               />
             }
             label="着手"
@@ -120,14 +152,24 @@ const SearchForm = (props: SearchFormProps) => {
               <Checkbox
                 name="done_ids[]"
                 value="1"
-                defaultChecked
+                checked={formValues.doneIds.includes('1')}
                 size="small"
+                onChange={handleChangeDoneIds}
               />
             }
             label="完了"
           />
         </FormGroup>
       </FormControl>
+      <Button
+        variant="outlined"
+        color="error"
+        size="small"
+        sx={{ float: 'right', marginRight: '10px' }}
+        onClick={handleReset}
+      >
+        リセット
+      </Button>
     </Paper>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UtilContext } from 'utils/contexts';
 import { UseFormSetValue } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+import MuiLink from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -30,6 +32,7 @@ interface LabelFormProps {
   setValue?: UseFormSetValue<{ labelIds: Label['id'][] }>;
   onChange?: (labels: Label[]) => void;
   canEdit?: boolean;
+  userId?: string;
 }
 
 const LabelForm = (props: LabelFormProps) => {
@@ -37,6 +40,8 @@ const LabelForm = (props: LabelFormProps) => {
   const [open, setOpen] = useState(false);
 
   const canEdit = props.canEdit !== false; // default: true
+  const baseUrl = props.userId ? `/admin/users/${props.userId}/tasks` : '/';
+
   // ---------------------------------------------------------
 
   const [labelIds, setLabelIds] = useState(props.defaultValue);
@@ -44,7 +49,6 @@ const LabelForm = (props: LabelFormProps) => {
 
   useEffect(() => {
     props.setValue?.('labelIds', labelIds);
-    console.log(props.labels, labelIds);
   }, []);
 
   const handleOpen = () => {
@@ -134,13 +138,16 @@ const LabelForm = (props: LabelFormProps) => {
       ：
       {labelIds.map((labelId) => {
         const label = props.labels.find((label) => label.id == labelId);
+        if (!label) return <></>;
         return (
-          <span
+          <MuiLink
             key={label.id}
             style={{ textDecoration: 'underline', margin: '0 10px' }}
+            component={Link}
+            to={`${baseUrl}?labelId=${label.id}`}
           >
             {label.name}
-          </span>
+          </MuiLink>
         );
       })}
       <Dialog fullWidth maxWidth={'xs'} open={open}>

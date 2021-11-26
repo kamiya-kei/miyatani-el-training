@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { UtilContext } from 'utils/contexts';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
@@ -51,11 +52,29 @@ interface TaskListProps {
 
 const TaskList = (props: TaskListProps) => {
   const { util } = useContext(UtilContext);
+  const navigate = useNavigate();
+
+  const query = new URLSearchParams(location.search);
+  const labelId = query.get('labelId') || null;
+
+  useEffect(() => {
+    getTasks({ labelId: query.get('labelId') || null });
+  }, [location.search]);
 
   const [searchParams, setSearchParams] = useState({
     ...DEFAULT_SEARCH_PARAMETERS,
+    ...(JSON.parse(localStorage.getItem('searchParams')) || {}),
     userId: props.userId,
+    labelId,
   });
+  const handleReset = () => {
+    if (labelId) {
+      localStorage.removeItem('searchParams');
+      navigate(props.userId ? `/admin/users/${props.userId}/tasks` : '/');
+      return;
+    }
+    getTasks(DEFAULT_SEARCH_PARAMETERS);
+  };
 
   const { data, refetch } = useQueryEx(GQL_TASKS, {
     variables: searchParams,
@@ -73,6 +92,7 @@ const TaskList = (props: TaskListProps) => {
   const getTasks = (newParams = {}) => {
     const allParams = { ...searchParams, ...newParams }; // 新しいパラメータを上書き
     setSearchParams(allParams);
+    localStorage.setItem('searchParams', JSON.stringify(allParams));
     refetch(allParams);
   };
 
@@ -116,7 +136,13 @@ const TaskList = (props: TaskListProps) => {
       <Stack spacing={2} style={{ padding: '20px 0' }}>
         {props.children}
         <div>
-          <SearchForm onSearch={handleSearch} />
+          <SearchForm
+            onSearch={handleSearch}
+            onReset={handleReset}
+            word={searchParams.word}
+            target={searchParams.target}
+            doneIds={searchParams.doneIds}
+          />
         </div>
         <div style={{ textAlign: 'right' }}>
           <SortForm
@@ -171,6 +197,7 @@ const TaskList = (props: TaskListProps) => {
                   setLabels={setLabels}
                   onChange={handleUpdateLabel(task.id)}
                   canEdit={!props.userId}
+                  userId={props.userId}
                 />
               </>
             }
