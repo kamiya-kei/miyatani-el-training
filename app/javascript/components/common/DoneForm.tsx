@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { UseFormSetValue } from 'react-hook-form';
 import { Inputs } from 'common/TaskForm';
 import Box from '@mui/material/Box';
@@ -15,6 +15,10 @@ interface DoneFormProps {
 
 const DoneForm = (props: DoneFormProps) => {
   const [done, setDone] = useState(props.defaultValue);
+
+  useEffect(() => {
+    props.setValue('doneId', props.defaultValue);
+  }, []);
 
   const handleChange = (event) => {
     setDone(event.target.value);

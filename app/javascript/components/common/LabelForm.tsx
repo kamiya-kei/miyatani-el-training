@@ -1,173 +1,216 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { UtilContext } from 'utils/contexts';
 import { UseFormSetValue } from 'react-hook-form';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
 import Dialog from '@mui/material/Dialog';
-import RadioGroup from '@mui/material/RadioGroup';
-import Radio from '@mui/material/Radio';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import IconButton from '@mui/material/IconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
+import Checkbox from '@mui/material/Checkbox';
+import Grid from '@mui/material/Grid';
+import Divider from '@mui/material/Divider';
 
-const options = [
-  'None',
-  'Atria',
-  'Callisto',
-  'Dione',
-  'Ganymede',
-  'Hangouts Call',
-  'Luna',
-  'Oberon',
-  'Phobos',
-  'Pyxis',
-  'Sedna',
-  'Titania',
-  'Triton',
-  'Umbriel',
-];
-
-export interface ConfirmationDialogRawProps {
-  id: string;
-  keepMounted: boolean;
-  value: string;
-  open: boolean;
-  onClose: (value?: string) => void;
-}
-
-function ConfirmationDialogRaw(props: ConfirmationDialogRawProps) {
-  const { onClose, value: valueProp, open, ...other } = props;
-  const [value, setValue] = React.useState(valueProp);
-  const radioGroupRef = React.useRef<HTMLElement>(null);
-
-  React.useEffect(() => {
-    if (!open) {
-      setValue(valueProp);
-    }
-  }, [valueProp, open]);
-
-  const handleEntering = () => {
-    if (radioGroupRef.current != null) {
-      radioGroupRef.current.focus();
-    }
-  };
-
-  const handleCancel = () => {
-    onClose();
-  };
-
-  const handleOk = () => {
-    onClose(value);
-  };
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue((event.target as HTMLInputElement).value);
-  };
-
-  return (
-    <Dialog
-      sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
-      maxWidth="xs"
-      TransitionProps={{ onEntering: handleEntering }}
-      open={open}
-      {...other}
-    >
-      <DialogTitle>Phone Ringtone</DialogTitle>
-      <DialogContent dividers>
-        <RadioGroup
-          ref={radioGroupRef}
-          aria-label="ringtone"
-          name="ringtone"
-          value={value}
-          onChange={handleChange}
-        >
-          {options.map((option) => (
-            <FormControlLabel
-              value={option}
-              key={option}
-              control={<Radio />}
-              label={option}
-            />
-          ))}
-        </RadioGroup>
-      </DialogContent>
-      <DialogActions>
-        <Button autoFocus onClick={handleCancel}>
-          Cancel
-        </Button>
-        <Button onClick={handleOk}>Ok</Button>
-      </DialogActions>
-    </Dialog>
-  );
-}
+import useMutationEx from 'hooks/useMutationEx';
+import {
+  GQL_CREATE_LABEL,
+  GQL_UPDATE_LABEL,
+  GQL_DELETE_LABEL,
+} from 'utils/gql';
+import { Label } from 'utils/types';
 
 interface LabelFormProps {
-  defaultValue: string[];
-  setValue: UseFormSetValue<{ labelIds: string[] }>;
+  labels: Label[];
+  defaultValue: Label['id'][];
+  setValue: UseFormSetValue<{ labelIds: Label['id'][] }>;
+  setLabels: (labels: Label[]) => void;
 }
 
 const LabelForm = (props: LabelFormProps) => {
-  // const [labelIds, setLabelIds] = useState(props.defaultValue);
+  const { util } = useContext(UtilContext);
+  const [open, setOpen] = useState(false);
 
-  // useEffect(() => {
-  //   props.setValue('labelIds', labelIds);
-  // }, []);
+  // ---------------------------------------------------------
 
-  // const handleChange = (event) => {
-  //   const val = event.target.value;
-  //   setLabelIds(val);
-  //   props.setValue('labelIds', val);
-  // };
+  const [labelIds, setLabelIds] = useState(props.defaultValue);
+  const [newLabelIds, setNewLabelIds] = useState([]);
 
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState('Dione');
+  useEffect(() => {
+    props.setValue('labelIds', labelIds);
+    console.log(props.labels, labelIds);
+  }, []);
 
-  const handleClickListItem = () => {
+  const handleOpen = () => {
+    setNewLabelIds(labelIds);
     setOpen(true);
   };
 
-  const handleClose = (newValue?: string) => {
+  const handleCancel = () => {
+    setNewLabelIds([]);
     setOpen(false);
+  };
 
-    if (newValue) {
-      setValue(newValue);
+  const handleSetLabel = () => {
+    props.setValue('labelIds', newLabelIds);
+    setLabelIds(newLabelIds);
+    setNewLabelIds([]);
+    setOpen(false);
+  };
+
+  const handleCheckLabel = (id) => (event) => {
+    const ids = new Set(newLabelIds);
+    if (event.target.checked) {
+      ids.add(id);
+    } else {
+      ids.delete(id);
     }
+    setNewLabelIds(Array.from(ids));
+  };
+
+  // ラベルの作成 ----------------------------------------------
+
+  const [createLabel] = useMutationEx(GQL_CREATE_LABEL, {
+    onCompleted: (res) => {
+      props.setLabels(res.createLabel.labels);
+      util.flashMessage('ラベルを作成しました');
+    },
+    onError: () => {
+      util.flashMessage('同じラベルが既に存在します', 'error');
+    },
+  });
+  const handleCreateLabel = () => {
+    const name = window.prompt('ラベル名を入力してください');
+    createLabel({ variables: { name } });
+  };
+
+  // ラベルの編集 ----------------------------------------------
+  const [updateLabel] = useMutationEx(GQL_UPDATE_LABEL, {
+    onCompleted: (res) => {
+      props.setLabels(res.updateLabel.labels);
+      util.flashMessage('ラベル名を変更しました');
+    },
+    onError: () => {
+      util.flashMessage('同じラベルが既に存在します', 'error');
+    },
+  });
+  const handleUpdateLabel = (label) => () => {
+    const name = window.prompt('ラベル名を入力してください', label.name);
+    if (name !== label.name) updateLabel({ variables: { id: label.id, name } });
+  };
+
+  // ラベルの削除 ----------------------------------------------
+
+  const [deleteLabel] = useMutationEx(GQL_DELETE_LABEL, {
+    onCompleted: (res) => {
+      props.setLabels(res.deleteLabel.labels);
+      util.flashMessage('ラベルを削除しました');
+    },
+  });
+  const handleDeleteLabel = (id) => async () => {
+    setOpen(false);
+    const is_agree = await util.confirmDialog(
+      '本当にラベルに削除してよろしいですか？'
+    );
+    setOpen(true);
+    if (is_agree) deleteLabel({ variables: { id } });
   };
 
   return (
-    <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <List component="div" role="group">
-        <ListItem button divider disabled>
-          <ListItemText primary="Interruptions" />
-        </ListItem>
-        <ListItem
-          button
-          divider
-          aria-haspopup="true"
-          aria-controls="ringtone-menu"
-          aria-label="phone ringtone"
-          onClick={handleClickListItem}
-        >
-          <ListItemText primary="Phone ringtone" secondary={value} />
-        </ListItem>
-        <ListItem button divider disabled>
-          <ListItemText
-            primary="Default notification ringtone"
-            secondary="Tethys"
-          />
-        </ListItem>
-        <ConfirmationDialogRaw
-          id="ringtone-menu"
-          keepMounted
-          open={open}
-          onClose={handleClose}
-          value={value}
-        />
-      </List>
-    </Box>
+    <>
+      ラベル
+      <IconButton size="small" onClick={handleOpen}>
+        <EditIcon />
+      </IconButton>
+      ：
+      {labelIds.map((labelId) => {
+        const label = props.labels.find((label) => label.id == labelId);
+        return (
+          <span
+            key={label.id}
+            style={{ textDecoration: 'underline', margin: '0 10px' }}
+          >
+            {label.name}
+          </span>
+        );
+      })}
+      <Dialog fullWidth maxWidth={'xs'} open={open}>
+        <DialogTitle sx={{ textAlign: 'center' }}>
+          ラベル
+          <IconButton
+            size="small"
+            sx={{ float: 'right' }}
+            onClick={handleCancel}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center' }}>
+          {props.labels.map((label) => (
+            <div key={label.id}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  padding: '0 20px',
+                }}
+              >
+                <Grid container>
+                  <Grid item xs={1}>
+                    <Checkbox
+                      checked={newLabelIds.includes(label.id)}
+                      onClick={handleCheckLabel(label.id)}
+                    />
+                  </Grid>
+                  <Grid item xs={9}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        paddingLeft: '40px',
+                        height: '100%',
+                      }}
+                    >
+                      {label.name}
+                    </div>
+                  </Grid>
+                  <Grid item xs={1}>
+                    <IconButton size="small" onClick={handleUpdateLabel(label)}>
+                      <EditIcon />
+                    </IconButton>
+                  </Grid>
+                  <Grid item xs={1}>
+                    <IconButton
+                      size="small"
+                      onClick={handleDeleteLabel(label.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+              </div>
+              <Divider />
+            </div>
+          ))}
+          <div style={{ marginTop: '20px' }}>
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={handleCreateLabel}
+            >
+              新しいラベルを作成
+            </Button>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleSetLabel}>OK</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 
