@@ -9,6 +9,14 @@ class Task < ApplicationRecord
   validates :done_id, inclusion: { in: Done.pluck(:id) }
   validates :priority_number, inclusion: { in: [0, 1, 2] }
 
+  def reset_labels(label_ids)
+    self.task_labels.destroy_all
+    return if label_ids.blank?
+    self.task_labels.create(
+      label_ids.map { |id| { label_id: id } }
+    )
+  end
+
   def self.search(word:, target:, done_ids:, sort_type:, is_asc:)
     sort_key = sort_type.underscore # スネークケースに変換
     sort_val = is_asc ? 'ASC' : 'DESC'
