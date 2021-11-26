@@ -25,5 +25,14 @@ module Types
     end
     field :users, resolver: Resolvers::Users
     field :user_signed_in, resolver: Resolvers::UserSignedIn
+
+    field :label, LabelType, null: true do
+      argument :id, ID, required: true
+    end
+    def label(id:)
+      # TODO: アクセス制御
+      Label.find(id)
+    end
+    field :labels, resolver: Resolvers::Labels
   end
 end
