@@ -12,6 +12,8 @@ import AdminTop from 'page/AdminTop';
 import AdminUserCreate from 'page/AdminUserCreate';
 import AdminUserUpdate from 'page/AdminUserUpdate';
 import AdminUserTasks from 'page/AdminUserTasks';
+import Error404 from 'page/Error404';
+import Error500 from 'page/Error500';
 
 const MyRouter = () => {
   const { isLogin } = useContext(UserContext);
@@ -28,6 +30,8 @@ const MyRouter = () => {
         <Route path="/admin/users/new" element={<AdminUserCreate />} />
         <Route path="/admin/users/:id/edit" element={<AdminUserUpdate />} />
         <Route path="/admin/users/:id/tasks" element={<AdminUserTasks />} />
+        <Route path="/error500" element={<Error500 />} />
+        <Route path="*" element={<Error404 />} />
       </Routes>
     </BrowserRouter>
   );
