@@ -309,6 +309,7 @@ RSpec.describe 'Tasks', type: :system do
     describe 'ページネーション' do
       before {
         tasks
+        sleep 1
         visit '/'
       }
 
