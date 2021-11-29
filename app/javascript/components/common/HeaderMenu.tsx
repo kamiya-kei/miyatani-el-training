@@ -12,6 +12,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Logout from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ConfirmDialog, { ConfirmDialogHandler } from 'common/ConfirmDialog';
 import { client } from 'common/MyApolloProvider';
 import { GQL_SIGN_OUT, GQL_DELETE_USER } from 'utils/gql';
@@ -118,6 +119,13 @@ const HeaderMenu = () => {
             <NoAccountsIcon fontSize="small" />
           </ListItemIcon>
           アカウント削除
+        </MenuItem>
+        <Divider />
+        <MenuItem component={Link} to="/admin">
+          <ListItemIcon>
+            <AdminPanelSettingsIcon fontSize="small" />
+          </ListItemIcon>
+          管理ページ
         </MenuItem>
       </Menu>
     </>

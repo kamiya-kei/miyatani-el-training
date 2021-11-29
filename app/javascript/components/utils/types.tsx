@@ -17,3 +17,10 @@ export interface Task {
 
 export type SortType = 'created_at' | 'deadline' | 'priority_number';
 export type SearchTarget = 'all' | 'title' | 'description';
+
+export interface User {
+  id: string;
+  name: string;
+  createdAt: string;
+  tasksCount: number;
+}
