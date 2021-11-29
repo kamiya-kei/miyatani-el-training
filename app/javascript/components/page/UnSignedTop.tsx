@@ -31,11 +31,11 @@ const UnSignedTop = () => {
             title={
               <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
-                  <Priority priority="2" />
+                  <Priority priority={2} />
                   タスク管理をはじめる
                 </div>
                 <div>
-                  <DoneChip done={{ id: -1, text: '未着手' }} />
+                  <DoneChip done={{ id: '-1', text: '未着手' }} />
                 </div>
               </Box>
             }

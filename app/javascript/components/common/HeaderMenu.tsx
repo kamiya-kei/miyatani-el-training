@@ -12,13 +12,14 @@ import Tooltip from '@mui/material/Tooltip';
 import Logout from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';
-import axios from 'module/axios_with_csrf';
-import ConfirmDialog from 'common/ConfirmDialog';
+import ConfirmDialog, { ConfirmDialogHandler } from 'common/ConfirmDialog';
+import { client } from 'common/MyApolloProvider';
+import { GQL_SIGN_OUT, GQL_DELETE_USER } from 'utils/gql';
 
 const HeaderMenu = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { setUser, isLogin } = useContext(UserContext);
 
-  const confirmDialogRef = React.useRef();
+  const confirmDialogRef = React.useRef({} as ConfirmDialogHandler);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -30,63 +31,21 @@ const HeaderMenu = () => {
   };
 
   const handleSignOut = () => {
-    axios
-      .post('/graphql', {
-        query: `
-          mutation {
-            signOut(input: {}) {
-              user {
-                id
-              }
-            }
-          }
-        `,
-      })
-      .then((res) => {
-        const user = res.data.data.signOut.user;
-        setUser({ user, isLogin: !!user });
-      })
-      .catch((error) => {
-        alert(
-          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-        );
-        console.error(error);
-      });
+    client.mutate({ mutation: GQL_SIGN_OUT }).then(() => {
+      setUser(null);
+    });
   };
 
   const handleDeleteUser = async () => {
     const is_agree = await confirmDialogRef.current.confirm();
-    if (!is_agree) {
-      return;
-    }
+    if (!is_agree) return;
 
-    axios
-      .post('/graphql', {
-        query: `
-          mutation {
-            deleteUser(input: {}) {
-              user {
-                id
-              }
-            }
-          }
-        `,
-      })
-      .then((res) => {
-        const user = res.data.data.deleteUser.user;
-        setUser({ user, isLogin: !!user });
-      })
-      .catch((error) => {
-        alert(
-          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-        );
-        console.error(error);
-      });
+    client.mutate({ mutation: GQL_DELETE_USER }).then(() => {
+      setUser(null);
+    });
   };
 
-  React.useEffect(() => console.log(user), [user]);
-
-  if (!user.isLogin) {
+  if (!isLogin) {
     return (
       <>
         <Button component={Link} to="/users/sign_in" color="inherit">

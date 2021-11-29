@@ -43,6 +43,7 @@ RSpec.describe 'Users', type: :system do
     describe 'ログイン実行' do
       subject {
         sign_in_as(user)
+        page
       }
       it { is_expected.to have_current_path('/') }
       it { is_expected.to have_content('タスク作成') }

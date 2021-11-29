@@ -14,7 +14,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import axios from 'module/axios_with_csrf';
+import { client } from 'common/MyApolloProvider';
+import { GQL_SIGN_IN } from 'utils/gql';
 
 const MANUAL_ERROR_MESSAGE = {
   type: 'manual',
@@ -30,49 +31,30 @@ const SignIn = () => {
   } = useForm();
 
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
+  const { setUser, isLogin } = useContext(UserContext);
 
   useEffect(() => {
-    if (!user.isLogin) return;
-    // 既にログイン済みの場合はトップへ飛ばす
-    navigate('/');
-  }, [user]);
+    if (isLogin) navigate('/'); // 既にログイン済みの場合はトップへ飛ばす
+  }, [isLogin]);
 
   const handleAction = (data) => {
-    console.log(data);
-    axios
-      .post('/graphql', {
-        query: `
-          mutation {
-            signIn(
-              input: {
-                name: "${data.name}"
-                password: "${data.password}"
-              }
-            ) {
-              user {
-                id
-                name
-              }
-            }
-          }
-        `,
+    client
+      .mutate({
+        mutation: GQL_SIGN_IN,
+        variables: {
+          name: data.name,
+          password: data.password,
+        },
       })
-      .then((res) => {
-        const user = res.data.data.signIn.user;
-        if (!user) {
-          setError('name', MANUAL_ERROR_MESSAGE);
-          setError('password', MANUAL_ERROR_MESSAGE);
-          return;
-        }
-        setUser({ user, isLogin: true });
+      .then(({ data }) => {
+        setUser(data.signIn.user);
         navigate('/');
       })
       .catch((error) => {
-        alert(
-          '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
-        );
-        console.error(error);
+        console.log(error);
+        console.log(error.message);
+        setError('name', MANUAL_ERROR_MESSAGE);
+        setError('password', MANUAL_ERROR_MESSAGE);
       });
   };
   React.useEffect(() => console.log(errors), [errors]);

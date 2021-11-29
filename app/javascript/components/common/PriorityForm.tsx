@@ -1,21 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { UseFormSetValue } from 'react-hook-form';
+import { Inputs } from 'common/TaskForm';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-const PriorityForm = (props) => {
-  const [priority, setPriority] = useState(props.defaultValue);
+interface PriorityFormProps {
+  defaultValue: number;
+  setValue: UseFormSetValue<Inputs>;
+}
+
+const PriorityForm = (props: PriorityFormProps) => {
+  const [priority, setPriority] = useState(props.defaultValue.toString());
 
   useEffect(() => {
-    props.setValue('priorityNumber', priority);
+    props.setValue('priorityNumber', +priority);
   }, []);
 
   const handleChange = (event) => {
     setPriority(event.target.value);
-    props.setValue('priorityNumber', event.target.value);
+    props.setValue('priorityNumber', +event.target.value);
   };
 
   return (
@@ -35,11 +41,6 @@ const PriorityForm = (props) => {
       </FormControl>
     </Box>
   );
-};
-
-PriorityForm.propTypes = {
-  defaultValue: PropTypes.number,
-  setValue: PropTypes.func,
 };
 
 export default PriorityForm;

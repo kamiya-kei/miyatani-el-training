@@ -2,6 +2,10 @@ import React, { forwardRef, useState, useImperativeHandle } from 'react';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 
+export interface FlashMessageHandler {
+  showMessage: (message: string) => void;
+}
+
 const FlashMessage = forwardRef((_, ref) => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
