@@ -4,6 +4,10 @@ RSpec.describe 'Users', type: :system do
   describe '一般ユーザー' do
     before { FactoryBot.create(:user, role_id: Role::ADMIN) }
 
+    let(:subject_sleep) {
+      subject
+      sleep 1
+    }
     describe '新規登録' do
       let(:user) { FactoryBot.build(:user) }
 
@@ -25,13 +29,7 @@ RSpec.describe 'Users', type: :system do
           click_button '登録'
           page
         }
-        it {
-          expect {
-            subject
-            sleep 1
-          }.to change { User.count }.from(1).to(2)
-        }
-
+        it { expect { subject_sleep }.to change { User.count }.from(1).to(2) }
         it { is_expected.to have_current_path('/') }
         it { is_expected.to have_content('タスク作成') }
       end
@@ -78,13 +76,7 @@ RSpec.describe 'Users', type: :system do
           click_button 'はい'
           page
         }
-        it {
-          expect {
-            subject
-            sleep 1
-          }.to change { User.count }.from(2).to(1)
-        }
-
+        it { expect { subject_sleep }.to change { User.count }.from(2).to(1) }
         it { is_expected.to have_no_content('タスク作成') }
         it { is_expected.to have_content('ログイン') }
       end
