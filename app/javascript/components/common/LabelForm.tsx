@@ -90,8 +90,11 @@ const LabelForm = (props: LabelFormProps) => {
       util.flashMessage('同じラベルが既に存在します', 'error');
     },
   });
-  const handleCreateLabel = () => {
-    const name = window.prompt('ラベル名を入力してください');
+  const handleCreateLabel = async () => {
+    setOpen(false);
+    const name = await util.promptDialog('ラベル名を入力してください');
+    setOpen(true);
+    if (!name) return;
     createLabel({ variables: { name } });
   };
 
@@ -105,9 +108,15 @@ const LabelForm = (props: LabelFormProps) => {
       util.flashMessage('同じラベルが既に存在します', 'error');
     },
   });
-  const handleUpdateLabel = (label) => () => {
-    const name = window.prompt('ラベル名を入力してください', label.name);
-    if (name !== label.name) updateLabel({ variables: { id: label.id, name } });
+  const handleUpdateLabel = (label) => async () => {
+    setOpen(false);
+    const name = await util.promptDialog(
+      'ラベル名を入力してください',
+      label.name
+    );
+    setOpen(true);
+    if (!name || name == label.name) return;
+    updateLabel({ variables: { id: label.id, name } });
   };
 
   // ラベルの削除 ----------------------------------------------

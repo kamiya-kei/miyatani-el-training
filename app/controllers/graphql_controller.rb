@@ -1,5 +1,6 @@
 class GraphqlController < ApplicationController
   class AuthorizationError < StandardError; end
+
   class AdminAuthorizationError < StandardError; end
 
   def execute

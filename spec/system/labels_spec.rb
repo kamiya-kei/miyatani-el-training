@@ -14,7 +14,9 @@ RSpec.describe 'Labels', type: :system do
       subject {
         visit '/tasks/new'
         find('[data-testid="EditIcon"]').click
-        accept_prompt(with: label.name) { click_button '新しいラベルを作成' }
+        click_button '新しいラベルを作成'
+        fill_in 'prompt', with: label.name
+        click_button '決定'
         page
       }
       let(:label) { FactoryBot.build(:label, user_id: user.id) }
@@ -28,9 +30,9 @@ RSpec.describe 'Labels', type: :system do
         label_before
         visit '/tasks/new'
         find('[data-testid="EditIcon"]').click
-        accept_prompt(with: label_after.name) {
-          find("[data-test-label='#{label_before.id}'] [data-testid='EditIcon']").click
-        }
+        find("[data-test-label='#{label_before.id}'] [data-testid='EditIcon']").click
+        fill_in 'prompt', with: label_after.name
+        click_button '決定'
         page
       }
       let(:label_before) { FactoryBot.create(:label, user_id: user.id) }
