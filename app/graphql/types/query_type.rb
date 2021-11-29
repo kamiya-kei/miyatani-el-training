@@ -1,6 +1,6 @@
 module Types
   class QueryType < Types::BaseObject
-    # Add `node(id: ID!) and `nodes(ids: [ID!]!)`
+    include GraphqlHelper
     include GraphQL::Types::Relay::HasNodeField
     include GraphQL::Types::Relay::HasNodesField
 
@@ -16,11 +16,7 @@ module Types
       argument :id, ID, required: true
     end
     def user(id:)
-      user = context[:user]
-      unless user.role.id == Role::ADMIN
-        raise GraphqlController::AdminAuthorizationError
-      end
-
+      authenticate_admin!
       User.find(id)
     end
     field :users, resolver: Resolvers::Users
@@ -30,7 +26,6 @@ module Types
       argument :id, ID, required: true
     end
     def label(id:)
-      # TODO: アクセス制御
       Label.find(id)
     end
     field :labels, resolver: Resolvers::Labels
