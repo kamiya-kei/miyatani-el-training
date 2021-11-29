@@ -22,7 +22,13 @@ RSpec.describe 'Users', type: :system do
         click_button '登録'
         page
       }
-      it { expect { subject }.to change { User.count }.from(0).to(1) }
+      it {
+        expect {
+          subject
+          sleep 1
+        }.to change { User.count }.from(0).to(1)
+      }
+
       it { is_expected.to have_current_path('/') }
       it { is_expected.to have_content('タスク作成') }
     end
