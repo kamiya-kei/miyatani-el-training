@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
+import { UtilContext } from 'utils/contexts';
+import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
 import AppBar from '@mui/material/AppBar';
@@ -9,6 +11,13 @@ import MuiLink from '@mui/material/Link';
 import HeaderMenu from 'common/HeaderMenu';
 
 const BaseLayout = (props: { children: React.ReactNode }) => {
+  const { util } = useContext(UtilContext);
+  const { state } = useLocation();
+
+  useEffect(() => {
+    if (state) util.flashMessage(state.message);
+  }, [state]);
+
   return (
     <>
       <CssBaseline />
