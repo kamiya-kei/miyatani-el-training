@@ -47,12 +47,10 @@ const TaskForm = (props: TaskFormProps) => {
   };
 
   const { data } = useQueryEx(GQL_LABELS);
-  const [labels, setLabels] = useState([] as Label[]);
+  const [labels, setLabels] = useState(null as Label[]);
   useEffect(() => {
-    if (!data.labels) return;
-    setLabels(data.labels || []);
+    if (data.labels) setLabels(data.labels);
   }, [data]);
-  // console.log(props.task);
 
   return (
     <form>
@@ -71,7 +69,7 @@ const TaskForm = (props: TaskFormProps) => {
             />
           </FormItem>
           <FormItem>
-            {labels.length && (
+            {labels && (
               <LabelForm
                 setValue={setValue}
                 defaultValue={props.task.labels?.map((label) => label.id) || []}

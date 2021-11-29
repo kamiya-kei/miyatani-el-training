@@ -285,6 +285,7 @@ const LABEL_FRAGMENT = gql`
   fragment LabelFragment on Label {
     id
     name
+    tasksCount
   }
 `;
 

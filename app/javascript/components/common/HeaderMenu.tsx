@@ -125,14 +125,16 @@ const HeaderMenu = () => {
           </ListItemIcon>
           アカウント削除
         </MenuItem>
-        <Divider />
         {user?.role.text == 'admin' && (
-          <MenuItem component={Link} to="/admin">
-            <ListItemIcon>
-              <AdminPanelSettingsIcon fontSize="small" />
-            </ListItemIcon>
-            管理ページ
-          </MenuItem>
+          <div>
+            <Divider />
+            <MenuItem component={Link} to="/admin">
+              <ListItemIcon>
+                <AdminPanelSettingsIcon fontSize="small" />
+              </ListItemIcon>
+              管理ページ
+            </MenuItem>
+          </div>
         )}
       </Menu>
     </>

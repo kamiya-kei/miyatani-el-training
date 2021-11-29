@@ -18,6 +18,7 @@ interface SearchFormProps {
   word: string;
   target: 'all' | 'title' | 'description';
   doneIds: Done['id'][];
+  children?: React.ReactNode;
 }
 
 const SearchForm = (props: SearchFormProps) => {
@@ -55,7 +56,7 @@ const SearchForm = (props: SearchFormProps) => {
   };
 
   return (
-    <Paper component="form" sx={{ p: '2px 4px' }}>
+    <Paper component="form" sx={{ p: '2px 4px', position: 'relative' }}>
       <Paper sx={{ p: '2px 4px', display: 'flex', alignItems: 'center' }}>
         <InputBase
           name="word"
@@ -114,6 +115,16 @@ const SearchForm = (props: SearchFormProps) => {
         </RadioGroup>
       </FormControl>
 
+      <Button
+        variant="outlined"
+        color="error"
+        size="small"
+        sx={{ float: 'right', margin: '10px 10px 0 0' }}
+        onClick={handleReset}
+      >
+        リセット
+      </Button>
+
       <FormControl component="fieldset">
         <FormGroup row aria-label="done_ids">
           <FormLabel
@@ -161,15 +172,8 @@ const SearchForm = (props: SearchFormProps) => {
           />
         </FormGroup>
       </FormControl>
-      <Button
-        variant="outlined"
-        color="error"
-        size="small"
-        sx={{ float: 'right', marginRight: '10px' }}
-        onClick={handleReset}
-      >
-        リセット
-      </Button>
+      <br />
+      {props.children}
     </Paper>
   );
 };

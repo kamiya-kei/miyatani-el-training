@@ -163,7 +163,7 @@ const LabelForm = (props: LabelFormProps) => {
         </DialogTitle>
         <DialogContent sx={{ textAlign: 'center' }}>
           {props.labels.map((label) => (
-            <div key={label.id}>
+            <div key={label.id} data-test-label={label.id}>
               <div
                 style={{
                   display: 'flex',

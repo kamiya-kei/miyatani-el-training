@@ -8,6 +8,7 @@ export type PriorityNumber = 0 | 1 | 2;
 export interface Label {
   id?: string;
   name?: string;
+  tasksCount?: number;
 }
 
 export interface Task {

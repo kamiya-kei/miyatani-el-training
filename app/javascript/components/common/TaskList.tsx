@@ -28,6 +28,7 @@ import {
 import { Label } from 'utils/types';
 import useQueryEx from 'hooks/useQueryEx';
 import useMutationEx from 'hooks/useMutationEx';
+import LabelLinks from './LabelLinks';
 
 const DEFAULT_SEARCH_PARAMETERS: {
   word: string;
@@ -142,7 +143,9 @@ const TaskList = (props: TaskListProps) => {
             word={searchParams.word}
             target={searchParams.target}
             doneIds={searchParams.doneIds}
-          />
+          >
+            <LabelLinks labels={labels} userId={props.userId} />
+          </SearchForm>
         </div>
         <div style={{ textAlign: 'right' }}>
           <SortForm

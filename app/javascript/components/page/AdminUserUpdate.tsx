@@ -17,6 +17,12 @@ import useQueryEx from 'hooks/useQueryEx';
 import useMutationEx from 'hooks/useMutationEx';
 import { GQL_USER, GQL_ADMIN_UPDATE_USER } from 'utils/gql';
 
+type networkError = {
+  result: {
+    errors: { message: string }[];
+  };
+};
+
 const AdminUserUpdate = () => {
   const navigate = useNavigate();
   const params = useParams();
@@ -39,7 +45,7 @@ const AdminUserUpdate = () => {
       });
     },
     onError: (res) => {
-      const result = res.networkError.result;
+      const result = (res.networkError as unknown as networkError).result;
       const error_messages = result.errors.map((v) => v.message);
       if (error_messages.includes('Failed to save the record')) {
         setError('roleId', {
