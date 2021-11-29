@@ -1,13 +1,9 @@
 module Resolvers
-  class Users < GraphQL::Schema::Resolver
+  class Users < BaseResolver
     type [Types::UserType], null: false
 
     def resolve
-      user = context[:user]
-      unless user.role.id == Role::ADMIN
-        raise GraphqlController::AdminAuthorizationError
-      end
-
+      authenticate_admin!
       User.includes(:tasks).order(created_at: 'DESC')
     end
   end

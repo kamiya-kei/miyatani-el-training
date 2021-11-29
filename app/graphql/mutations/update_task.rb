@@ -11,10 +11,9 @@ module Mutations
     argument :label_ids,       [ID],   required: false
 
     def resolve(id:, label_ids: [], **args)
-      user = context[:user]
-      return if user.nil?
+      authenticate_user!
 
-      task = Task.where(user_id: user.id).find(id)
+      task = Task.where(user_id: current_user.id).find(id)
       task.update!(args)
       task.reset_labels(label_ids)
       {

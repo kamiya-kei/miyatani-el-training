@@ -12,19 +12,19 @@ class Task < ApplicationRecord
   def reset_labels(label_ids)
     self.task_labels.destroy_all
     return if label_ids.blank?
+
     self.task_labels.create(
       label_ids.map { |id| { label_id: id } }
     )
   end
 
-  def self.search(word:, target:, done_ids:, sort_type:, is_asc:, label_id:)
-    sort_key = sort_type.underscore # スネークケースに変換
-    sort_val = is_asc ? 'ASC' : 'DESC'
-    Task.
-      filter_by_done_ids(done_ids).
-      filter_by_label(label_id).
-      search_word("%#{word}%", target).
-      order(sort_key => sort_val)
+  def self.search(user_id, options)
+    params = self.search_params(options)
+    Task.where(user_id: user_id).
+      filter_by_label(params[:label_id]).
+      filter_by_done_ids(params[:done_ids]).
+      search_word("%#{params[:word]}%", params[:target]).
+      order(params[:sort_type] => (params[:is_asc] ? 'ASC' : 'DESC'))
   end
 
   scope :search_word, ->(word_ptn, target) do
@@ -49,6 +49,17 @@ class Task < ApplicationRecord
   scope :filter_by_label, ->(label_id) do
     return if label_id.blank? # 空の場合フィルタリング不要
 
-    where(id: TaskLabel.where(label_id: label_id).pluck(:task_id))
+    where(id: TaskLabel.where(label_id: label_id).select(:task_id))
+  end
+
+  def self.search_params(options)
+    {
+      word: options.fetch(:word, ''),
+      target: options.fetch(:target, 'all'),
+      done_ids: options.fetch(:done_ids, [-1, 0, 1]),
+      sort_type: options.fetch(:sort_type, 'created_at'),
+      is_asc: options.fetch(:is_asc, false),
+      label_id: options.fetch(:label_id, nil)
+    }
   end
 end

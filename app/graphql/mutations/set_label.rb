@@ -8,12 +8,11 @@ module Mutations
     argument :checked,  Boolean, required: true
 
     def resolve(task_id:, label_id:, checked:)
-      user = context[:user]
-      return if user.nil?
+      authenticate_user!
 
       # タスク・食べるがログイン中のユーザーのものか確認
-      user.tasks.find(task_id)
-      user.labels.find(label_id)
+      current_user.tasks.find(task_id)
+      current_user.labels.find(label_id)
 
       if checked
         task_label = TaskLabel.create!(task_id: task_id, label_id: label_id)

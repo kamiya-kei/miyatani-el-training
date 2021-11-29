@@ -7,7 +7,7 @@ module Mutations
 
     def resolve(name:, password:)
       user = User.search(name, password)
-      context[:session][:user_id] = user.id
+      sign_in(user)
       {
         user: user
       }

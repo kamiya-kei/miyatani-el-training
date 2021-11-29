@@ -5,10 +5,9 @@ module Mutations
     argument :id, ID, required: true
 
     def resolve(id: nil)
-      user = context[:user]
-      return if user.nil?
+      authenticate_user!
 
-      task = Task.where(user_id: user['id']).find(id)
+      task = current_user.tasks.find(id)
       task.destroy!
       {
         task: task

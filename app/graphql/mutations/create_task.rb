@@ -10,10 +10,9 @@ module Mutations
     argument :label_ids,       [ID],   required: false
 
     def resolve(label_ids: [], **args)
-      user = context[:user]
-      return if user.nil?
+      authenticate_user!
 
-      task = Task.create!(args.merge(user_id: user['id']))
+      task = Task.create!(args.merge(user_id: current_user.id))
       task.reset_labels(label_ids)
       {
         task: task

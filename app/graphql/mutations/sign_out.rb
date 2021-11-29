@@ -3,7 +3,7 @@ module Mutations
     field :user, Types::UserType, null: true
 
     def resolve
-      context[:session][:user_id] = nil
+      sign_out
       {
         user: nil
       }

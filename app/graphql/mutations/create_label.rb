@@ -5,11 +5,10 @@ module Mutations
     argument :name, String, required: true
 
     def resolve(name:)
-      user = context[:user]
-      return if user.nil?
+      authenticate_user!
 
-      user.labels.create(name: name)
-      { labels: user.labels.order(name: 'ASC') }
+      current_user.labels.create(name: name)
+      { labels: current_user.labels.order(name: 'ASC') }
     end
   end
 end

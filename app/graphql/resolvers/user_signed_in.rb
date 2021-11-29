@@ -1,9 +1,9 @@
 module Resolvers
-  class UserSignedIn < GraphQL::Schema::Resolver
+  class UserSignedIn < BaseResolver
     type Types::UserType, null: true
 
     def resolve
-      context[:user]
+      current_user
     end
   end
 end

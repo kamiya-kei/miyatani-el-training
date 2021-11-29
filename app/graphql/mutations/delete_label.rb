@@ -5,12 +5,11 @@ module Mutations
     argument :id, ID, required: true
 
     def resolve(id:)
-      user = context[:user]
-      return if user.nil?
+      authenticate_user!
 
-      label = user.labels.find(id)
+      label = current_user.labels.find(id)
       label.destroy!
-      { labels: user.labels.order(name: 'ASC') }
+      { labels: current_user.labels.order(name: 'ASC') }
     end
   end
 end
