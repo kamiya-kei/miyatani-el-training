@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { UserContext } from 'utils/contexts';
+import { UserContext, UtilContext } from 'utils/contexts';
 import { Link } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Menu from '@mui/material/Menu';
@@ -13,14 +13,11 @@ import Logout from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import NoAccountsIcon from '@mui/icons-material/NoAccounts';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import ConfirmDialog, { ConfirmDialogHandler } from 'common/ConfirmDialog';
-import { client } from 'common/MyApolloProvider';
+import useMutationEx from 'hooks/useMutationEx';
 import { GQL_SIGN_OUT, GQL_DELETE_USER } from 'utils/gql';
 
 const HeaderMenu = () => {
-  const { setUser, isLogin } = useContext(UserContext);
-
-  const confirmDialogRef = React.useRef({} as ConfirmDialogHandler);
+  const { util } = useContext(UtilContext);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -31,19 +28,28 @@ const HeaderMenu = () => {
     setAnchorEl(null);
   };
 
-  const handleSignOut = () => {
-    client.mutate({ mutation: GQL_SIGN_OUT }).then(() => {
+  const { user, setUser, isLogin } = useContext(UserContext);
+  const [signOut] = useMutationEx(GQL_SIGN_OUT, {
+    onCompleted: () => {
       setUser(null);
-    });
-  };
+    },
+  });
+  const [deleteUser] = useMutationEx(GQL_DELETE_USER, {
+    onCompleted: () => {
+      setUser(null);
+    },
+    onError: () => {
+      util.flashMessage(
+        'ユーザーを削除できませんでした。管理ユーザーは最低1人は必要です',
+        'error'
+      );
+    },
+  });
 
+  const handleSignOut = () => signOut();
   const handleDeleteUser = async () => {
-    const is_agree = await confirmDialogRef.current.confirm();
-    if (!is_agree) return;
-
-    client.mutate({ mutation: GQL_DELETE_USER }).then(() => {
-      setUser(null);
-    });
+    const is_agree = await util.confirmDialog();
+    if (is_agree) deleteUser();
   };
 
   if (!isLogin) {
@@ -61,7 +67,6 @@ const HeaderMenu = () => {
 
   return (
     <>
-      <ConfirmDialog ref={confirmDialogRef} />
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
         <Button component={Link} to="/tasks/new" color="inherit">
           タスク作成
@@ -121,12 +126,14 @@ const HeaderMenu = () => {
           アカウント削除
         </MenuItem>
         <Divider />
-        <MenuItem component={Link} to="/admin">
-          <ListItemIcon>
-            <AdminPanelSettingsIcon fontSize="small" />
-          </ListItemIcon>
-          管理ページ
-        </MenuItem>
+        {user?.role.text == 'admin' && (
+          <MenuItem component={Link} to="/admin">
+            <ListItemIcon>
+              <AdminPanelSettingsIcon fontSize="small" />
+            </ListItemIcon>
+            管理ページ
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

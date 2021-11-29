@@ -15,7 +15,7 @@ const AdminUserTasks = () => {
   } = useQueryEx(GQL_USER, { variables: { id: params.id } });
 
   return (
-    <AdminLayout>
+    <AdminLayout maxWidth="sm">
       {user && (
         <TaskList userId={user.id}>
           <h3 style={{ textAlign: 'center' }}>{user.name}さんのタスク一覧</h3>

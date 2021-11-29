@@ -9,6 +9,7 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import RoleForm from 'common/RoleForm';
 
 import useMutationEx from 'hooks/useMutationEx';
 import { GQL_ADMIN_CREATE_USERS } from 'utils/gql';
@@ -21,6 +22,7 @@ const AdminUserCreate = () => {
     formState: { errors },
     setError,
     getValues,
+    setValue,
   } = useForm();
 
   const [createUser] = useMutationEx(GQL_ADMIN_CREATE_USERS, {
@@ -126,6 +128,9 @@ const AdminUserCreate = () => {
                   error={!!errors.passwordConfirmation}
                   helperText={errors.passwordConfirmation?.message}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <RoleForm defaultValue="0" setValue={setValue} />
               </Grid>
             </Grid>
             <Button

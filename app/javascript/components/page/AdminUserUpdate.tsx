@@ -10,7 +10,9 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import RoleForm from 'common/RoleForm';
 
+import { User } from 'utils/types';
 import useQueryEx from 'hooks/useQueryEx';
 import useMutationEx from 'hooks/useMutationEx';
 import { GQL_USER, GQL_ADMIN_UPDATE_USER } from 'utils/gql';
@@ -24,20 +26,37 @@ const AdminUserUpdate = () => {
     formState: { errors },
     setError,
     getValues,
+    setValue,
+    clearErrors,
   } = useForm();
 
   const { data } = useQueryEx(GQL_USER, { variables: { id: params.id } });
+  const user = (data.user || null) as User;
   const [updateUser] = useMutationEx(GQL_ADMIN_UPDATE_USER, {
     onCompleted: () => {
       navigate('/admin', {
         state: { message: 'ユーザー情報を更新しました' },
       });
     },
-    onError: () => {
-      setError('name', {
-        type: 'manual',
-        message: 'このユーザー名は既に使われております',
-      });
+    onError: (res) => {
+      const result = res.networkError.result;
+      const error_messages = result.errors.map((v) => v.message);
+      if (error_messages.includes('Failed to save the record')) {
+        setError('roleId', {
+          type: 'manual',
+          message: '管理ユーザーが最低1人は必要です',
+        });
+      }
+      if (
+        error_messages.includes(
+          'Validation failed: Name has already been taken'
+        )
+      ) {
+        setError('name', {
+          type: 'manual',
+          message: 'このユーザー名は既に使われております',
+        });
+      }
     },
   });
 
@@ -45,6 +64,7 @@ const AdminUserUpdate = () => {
     const inputs = Object.fromEntries(
       Object.entries(data).filter(([, val]) => val) // 入力していない値を取り除く
     );
+    console.log(data);
     updateUser({ variables: { id: params.id, ...inputs } });
   };
 
@@ -63,7 +83,7 @@ const AdminUserUpdate = () => {
           <Typography component="h1" variant="h5">
             ユーザー情報更新
           </Typography>
-          {data.user && (
+          {user && (
             <Box
               component="form"
               noValidate
@@ -78,7 +98,7 @@ const AdminUserUpdate = () => {
                     label="ユーザー名"
                     name="name"
                     autoComplete="username"
-                    defaultValue={data.user.name}
+                    defaultValue={user.name}
                     {...register('name')}
                     error={!!errors.name}
                     helperText={errors.name?.message}
@@ -131,6 +151,14 @@ const AdminUserUpdate = () => {
                     })}
                     error={!!errors.passwordConfirmation}
                     helperText={errors.passwordConfirmation?.message}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <RoleForm
+                    defaultValue={user.role.id}
+                    setValue={setValue}
+                    error={!!errors.roleId}
+                    clearErrors={clearErrors}
                   />
                 </Grid>
               </Grid>

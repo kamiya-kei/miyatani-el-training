@@ -17,8 +17,8 @@ export const UserContext = createContext({
 
 interface UtilContext {
   util: {
-    flashMessage: (message) => void;
-    confirmDialog: () => Promise<boolean>;
+    flashMessage: (message, severity?) => void;
+    confirmDialog: (message?) => Promise<boolean>;
     setBackdrop: (loading: boolean) => void;
   };
 }

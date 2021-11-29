@@ -3,8 +3,10 @@ module Resolvers
     type [Types::UserType], null: false
 
     def resolve
-      User.find(context[:session][:user]['id'])
-      # TODO: 管理者権限の確認
+      user = context[:user]
+      unless user.role.id == Role::ADMIN
+        raise GraphqlController::AdminAuthorizationError
+      end
 
       User.includes(:tasks).order(created_at: 'DESC')
     end

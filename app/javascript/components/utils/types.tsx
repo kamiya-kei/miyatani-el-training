@@ -18,9 +18,12 @@ export interface Task {
 export type SortType = 'created_at' | 'deadline' | 'priority_number';
 export type SearchTarget = 'all' | 'title' | 'description';
 
+export type Role = { id: '0'; text: 'regular' } | { id: '1'; text: 'admin' };
+
 export interface User {
-  id: string;
-  name: string;
-  createdAt: string;
-  tasksCount: number;
+  id?: string;
+  name?: string;
+  role?: Role;
+  createdAt?: string;
+  tasksCount?: number;
 }

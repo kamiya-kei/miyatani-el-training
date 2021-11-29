@@ -1,22 +1,20 @@
 class GraphqlController < ApplicationController
-  # If accessing from outside this domain, nullify the session
-  # This allows for outside API access while preventing CSRF attacks,
-  # but you'll have to authenticate your user separately
-  # protect_from_forgery with: :null_session
+  class AdminAuthorizationError < StandardError; end
 
   def execute
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
     context = {
-      session: session
+      session: session,
+      user: User.find_by(id: session[:user_id])
     }
     result = MiyataniElTrainingSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
+  rescue AdminAuthorizationError
+    render json: { error: { message: 'Admin Authorization Error' } }, status: :forbidden
   rescue => e
-    raise e unless Rails.env.development?
-
-    handle_error_in_development(e)
+    render json: { errors: [{ message: e.message }], data: {} }, status: :bad_request
   end
 
   private

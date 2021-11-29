@@ -1,19 +1,22 @@
 import React, { forwardRef, useState, useImperativeHandle } from 'react';
-import Alert from '@mui/material/Alert';
+import Alert, { AlertColor } from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 
 export interface FlashMessageHandler {
-  showMessage: (message: string) => void;
+  showMessage: (message: string, severity: AlertColor) => void;
 }
 
 const FlashMessage = forwardRef((_, ref) => {
   const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState('');
   const handleClose = () => setOpen(false);
 
+  const [message, setMessage] = useState('');
+  const [severity, setSeverity] = useState('success' as AlertColor);
+
   useImperativeHandle(ref, () => ({
-    showMessage: (message) => {
+    showMessage: (message: string, newSeverity: AlertColor = null) => {
       setMessage(message);
+      setSeverity(newSeverity || 'success');
       setOpen(true);
     },
   }));
@@ -25,7 +28,7 @@ const FlashMessage = forwardRef((_, ref) => {
       autoHideDuration={6000}
       onClose={handleClose}
     >
-      <Alert severity="success" onClose={handleClose}>
+      <Alert severity={severity} onClose={handleClose}>
         {message}{' '}
       </Alert>
     </Snackbar>

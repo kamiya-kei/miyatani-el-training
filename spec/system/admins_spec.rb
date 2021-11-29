@@ -6,7 +6,7 @@ RSpec.describe '管理者ページ', type: :system do
       sign_in_as(admin)
     end
 
-    let(:admin) { FactoryBot.create(:user) }
+    let(:admin) { FactoryBot.create(:user, role_id: Role::ADMIN) }
     let(:user) { FactoryBot.create(:user) }
     let(:tasks) { FactoryBot.create_list(:task, tasks_count, user_id: user.id) }
 
@@ -22,8 +22,8 @@ RSpec.describe '管理者ページ', type: :system do
 
       it 'タスク数が取得・表示できている' do
         subject
-        expect(page.all("[data-test-user='#{user.id}'] td")[1].text).to eq(tasks_count.to_s)
-        expect(page.all("[data-test-user='#{users[0].id}'] td")[1].text).to eq('0')
+        expect(page.all("[data-test-user='#{user.id}'] td")[2].text).to eq(tasks_count.to_s)
+        expect(page.all("[data-test-user='#{users[0].id}'] td")[2].text).to eq('0')
       end
     end
 
@@ -59,14 +59,43 @@ RSpec.describe '管理者ページ', type: :system do
         fill_in 'name', with: user_new_info.name
         fill_in 'password', with: user_new_info.password
         fill_in 'password_confirmation', with: user_new_info.password_confirmation
+        page.all('[role="button"]')[0].click # ユーザータイプのドロップメニュークリック
+        sleep 1
+        page.all('[role="option"]')[1].click # 管理ユーザーを選択
         click_button '更新'
         page
       }
       let(:user_new_info) { FactoryBot.build(:user) }
+      it 'ユーザータイプが変更できている' do
+        subject
+        expect(page.all("[data-test-user='#{user.id}'] td")[1].text).to eq('管理ユーザー')
+      end
+
       it { is_expected.to have_current_path('/admin') }
       it { is_expected.to have_content('ユーザー情報を更新しました') }
       it { is_expected.to have_content(user_new_info.name) }
       it { is_expected.to have_no_content(user.name) }
+    end
+
+    describe 'ユーザー一覧からユーザータイプ変更' do
+      subject {
+        user
+        visit '/admin'
+        # userを管理ユーザーに変更
+        page.all("[data-test-user='#{user.id}'] [role='button']")[0].click
+        sleep 1
+        page.all('[role="option"]')[1].click
+        # adminを一般ユーザーに変更
+        page.all("[data-test-user='#{another_admin.id}'] [role='button']")[0].click
+        sleep 1
+        page.all('[role="option"]')[0].click
+      }
+      let!(:another_admin) { FactoryBot.create(:user, role_id: Role::ADMIN) }
+      it 'test' do
+        subject
+        expect(page.all("[data-test-user='#{user.id}'] td")[1].text).to eq('管理ユーザー')
+        expect(page.all("[data-test-user='#{another_admin.id}'] td")[1].text).to eq('一般ユーザー')
+      end
     end
 
     describe 'ユーザー削除' do

@@ -82,4 +82,46 @@ RSpec.describe User, type: :model do
       it { is_expected.to eq false }
     end
   end
+
+  describe '管理ユーザー' do
+    before { admin }
+
+    let(:admin) { FactoryBot.create(:user, role_id: Role::ADMIN) }
+    let(:another_admin) { FactoryBot.create(:user, role_id: Role::ADMIN) }
+    let(:user) { FactoryBot.create(:user, role_id: Role::REGULAR) }
+    let(:another_user) { FactoryBot.create(:user, role_id: Role::REGULAR) }
+    describe '正常系' do
+      describe '一般ユーザーは1人でも削除できる' do
+        subject { user.destroy! }
+        it { expect { subject }.not_to raise_error }
+      end
+
+      describe '一般ユーザーは1人でも管理ユーザーに変更できる' do
+        subject { user.update!(role_id: Role::ADMIN) }
+        it { expect { subject }.not_to raise_error }
+      end
+
+      describe '管理ユーザーは1人じゃなければ削除できる' do
+        subject { another_admin.destroy! }
+        it { expect { subject }.not_to raise_error }
+      end
+
+      describe '管理ユーザーは1人じゃなければ一般ユーザーに変更できる' do
+        subject { another_admin.update!(role_id: Role::REGULAR) }
+        it { expect { subject }.not_to raise_error }
+      end
+    end
+
+    describe '異常系' do
+      describe '管理ユーザーが1人のときは削除できない' do
+        subject { admin.destroy! }
+        it { expect { subject }.to raise_error(ActiveRecord::RecordNotDestroyed) }
+      end
+
+      describe '管理ユーザーが1人のときは一般ユーザーに変更できない' do
+        subject { admin.update!(role_id: Role::REGULAR) }
+        it { expect { subject }.to raise_error(ActiveRecord::RecordNotSaved) }
+      end
+    end
+  end
 end

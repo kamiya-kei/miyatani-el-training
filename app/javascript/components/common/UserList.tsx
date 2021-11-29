@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { UtilContext } from 'utils/contexts';
+import { useNavigate } from 'react-router-dom';
+import { UtilContext, UserContext } from 'utils/contexts';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,6 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import RoleForm from 'common/RoleForm';
 
 import { Link } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -18,7 +20,11 @@ import { DATETIME_FORMAT } from 'utils/constants';
 import { User } from 'utils/types';
 import useQueryEx from 'hooks/useQueryEx';
 import useMutationEx from 'hooks/useMutationEx';
-import { GQL_USERS, GQL_ADMIN_DELETE_USER } from 'utils/gql';
+import {
+  GQL_USERS,
+  GQL_ADMIN_DELETE_USER,
+  GQL_ADMIN_UPDATE_USER,
+} from 'utils/gql';
 
 interface UserListRowProps {
   user: User;
@@ -26,6 +32,8 @@ interface UserListRowProps {
 }
 
 const UserListRow = ({ user, onDelete }: UserListRowProps) => {
+  const { util } = useContext(UtilContext);
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,12 +46,31 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
     onDelete(id);
   };
 
+  const [updateUser, { error }] = useMutationEx(GQL_ADMIN_UPDATE_USER, {
+    onCompleted: () => {
+      util.flashMessage('ユーザータイプを変更しました');
+    },
+    onError: () => {
+      util.flashMessage('ユーザータイプを変更できませんでした', 'error');
+    },
+  });
+  const handleChangeUserRole = (roleId) => {
+    updateUser({ variables: { id: user.id, roleId } });
+  };
+
   return (
     <TableRow data-test-user={user.id}>
       <TableCell component="th" scope="row">
         {user.id}
       </TableCell>
       <TableCell align="left">{user.name}</TableCell>
+      <TableCell align="left">
+        <RoleForm
+          defaultValue={user.role.id}
+          onChange={handleChangeUserRole}
+          error={!!error}
+        />
+      </TableCell>
       <TableCell align="right">{user.tasksCount}</TableCell>
       <TableCell>{dayjs(user.createdAt).format(DATETIME_FORMAT)}</TableCell>
       <TableCell>
@@ -82,19 +109,39 @@ const UserListRow = ({ user, onDelete }: UserListRowProps) => {
 };
 
 const UserList = () => {
+  const navigate = useNavigate();
   const { util } = useContext(UtilContext);
+  const { user } = useContext(UserContext);
+  const [isDeleteSelf, setIsDeleteSelf] = useState(false);
 
   const { data, refetch } = useQueryEx(GQL_USERS);
   const users: User[] = data.users || [];
   const [deleteUser] = useMutationEx(GQL_ADMIN_DELETE_USER, {
     onCompleted: () => {
+      if (isDeleteSelf) {
+        navigate('/', {
+          state: { message: 'アカウントを削除し、ログアウトしました。' },
+        });
+        return;
+      }
       util.flashMessage('ユーザーを削除しました');
       refetch();
+    },
+    onError: () => {
+      util.flashMessage(
+        'ユーザーを削除できませんでした。管理ユーザーは最低1人は必要です',
+        'error'
+      );
     },
   });
 
   const handleDeleteUser = async (id) => {
-    const is_agree = await util.confirmDialog();
+    const isDeleteSelf = user.id === id;
+    setIsDeleteSelf(isDeleteSelf);
+    const message = isDeleteSelf
+      ? '現在ログイン中のユーザーを削除しますか？削除後自動的にログアウトします'
+      : '本当にこのユーザーを削除しますか？';
+    const is_agree = await util.confirmDialog(message);
     if (is_agree) deleteUser({ variables: { id } });
   };
 
@@ -105,6 +152,7 @@ const UserList = () => {
           <TableRow>
             <TableCell>ID</TableCell>
             <TableCell>ユーザー名</TableCell>
+            <TableCell>ユーザータイプ</TableCell>
             <TableCell>タスク数</TableCell>
             <TableCell>登録日時</TableCell>
             <TableCell>メニュー</TableCell>

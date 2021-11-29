@@ -12,16 +12,25 @@ import Container from '@mui/material/Container';
 import MuiLink from '@mui/material/Link';
 import HeaderMenu from 'common/HeaderMenu';
 
-const AdminLayout = (props: { children: React.ReactNode }) => {
+interface AdminLayoutProps {
+  children: React.ReactNode;
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+}
+
+const AdminLayout = (props: AdminLayoutProps) => {
   const navigate = useNavigate();
   const { state } = useLocation();
 
-  const { isLogin, loadingUser } = useContext(UserContext);
+  const { user, isLogin, loadingUser } = useContext(UserContext);
   const { util } = useContext(UtilContext);
 
   useEffect(() => {
     if (loadingUser) return;
-    if (!isLogin) return navigate('/users/sign_in'); // ログインしてない場合はログインページへ飛ばす // TODO: 管理者権限の確認
+    if (!isLogin) return navigate('/users/sign_in'); // ログインしてない場合はログインページへ飛ばす
+    if (user.role.text !== 'admin') {
+      alert('このページは管理者専用のページです');
+      navigate('/');
+    }
   }, [isLogin, loadingUser]);
 
   useEffect(() => {
@@ -48,7 +57,7 @@ const AdminLayout = (props: { children: React.ReactNode }) => {
       </AppBar>
       <Container
         disableGutters
-        maxWidth="sm"
+        maxWidth={props.maxWidth || 'md'}
         component="main"
         sx={{ pt: 8, pb: 6 }}
       >

@@ -16,8 +16,10 @@ module Types
       argument :id, ID, required: true
     end
     def user(id:)
-      User.find(context[:session][:user]['id'])
-      # TODO: 管理者権限の確認
+      user = context[:user]
+      unless user.role.id == Role::ADMIN
+        raise GraphqlController::AdminAuthorizationError
+      end
 
       User.find(id)
     end

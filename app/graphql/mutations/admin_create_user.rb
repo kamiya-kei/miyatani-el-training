@@ -5,10 +5,13 @@ module Mutations
     argument :name,                  String, required: true
     argument :password,              String, required: true
     argument :password_confirmation, String, required: true
+    argument :role_id,               ID,     required: true
 
     def resolve(**args)
-      user = context[:session][:user]
-      return if user.nil? # TODO: 管理者権限の確認
+      user = context[:user]
+      unless user.role.id == Role::ADMIN
+        raise GraphqlController::AdminAuthorizationError
+      end
 
       target_user = User.create!(args)
       {

@@ -21,7 +21,7 @@ const Transition = forwardRef(
 Transition.displayName = 'Transition';
 
 export interface ConfirmDialogHandler {
-  confirm: () => Promise<boolean>;
+  confirm: (message: string) => Promise<boolean>;
 }
 
 const ConfirmDialog = forwardRef<ConfirmDialogHandler>((props, ref) => {
@@ -34,9 +34,10 @@ const ConfirmDialog = forwardRef<ConfirmDialogHandler>((props, ref) => {
     setHandleDisagree(null);
     setOpen(false);
   };
+  const [message, setMessage] = useState('');
 
   useImperativeHandle(ref, () => ({
-    confirm: () =>
+    confirm: (message = '本当によろしいですか？') =>
       new Promise((resolve) => {
         setHandleAgree(() => () => {
           resetHandle();
@@ -46,6 +47,7 @@ const ConfirmDialog = forwardRef<ConfirmDialogHandler>((props, ref) => {
           resetHandle();
           resolve(false);
         });
+        setMessage(message);
         setOpen(true);
       }),
   }));
@@ -62,7 +64,7 @@ const ConfirmDialog = forwardRef<ConfirmDialogHandler>((props, ref) => {
         <DialogTitle>確認</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            本当によろしいですか？
+            {message}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
