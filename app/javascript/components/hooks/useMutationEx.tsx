@@ -14,8 +14,9 @@ const useMutationEx: useMutationEx = (mutation, options) => {
     if (options.onError) return;
     if (!error) return;
     console.error(error);
-    alert(
-      '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。'
+    util.flashMessage(
+      '申し訳ございません、エラーが発生しました。ページを再読み込みしてください。',
+      'error'
     );
   }, [error]);
 
