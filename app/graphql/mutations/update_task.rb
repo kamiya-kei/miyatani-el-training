@@ -8,15 +8,14 @@ module Mutations
     argument :deadline,        String, required: false
     argument :done_id,         ID,     required: false
     argument :priority_number, Int,    required: false
+    argument :label_ids,       [ID],   required: false
 
-    def resolve(**args)
-      user = context[:user]
-      return if user.nil?
+    def resolve(id:, label_ids: [], **args)
+      authenticate_user!
 
-      task = Task.where(user_id: user['id']).find(args[:id])
-      task.update!(
-        args.except(:id)
-      )
+      task = Task.where(user_id: current_user.id).find(id)
+      task.update!(args)
+      task.reset_labels(label_ids)
       {
         task: task
       }

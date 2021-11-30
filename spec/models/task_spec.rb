@@ -49,10 +49,7 @@ RSpec.describe Task, type: :model do
   describe '検索' do
     subject {
       create_tasks
-      Task.
-        search(word: '', target: 'all', done_ids: [-1, 0, 1], sort_type: 'created_at', is_asc: false, **params).
-        pluck(:id).
-        to_set
+      Task.search(user.id, params).pluck(:id).to_set
     }
     let(:create_tasks) {
       [

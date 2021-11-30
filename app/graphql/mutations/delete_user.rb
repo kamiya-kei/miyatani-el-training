@@ -3,9 +3,8 @@ module Mutations
     field :user, Types::UserType, null: true
 
     def resolve
-      user = context[:user]
-      user.destroy!
-      context[:session][:user_id] = nil
+      current_user.destroy!
+      sign_out
       {
         user: nil
       }

@@ -1,5 +1,9 @@
 module Types
   class MutationType < Types::BaseObject
+    field :set_label, mutation: Mutations::SetLabel
+    field :delete_label, mutation: Mutations::DeleteLabel
+    field :update_label, mutation: Mutations::UpdateLabel
+    field :create_label, mutation: Mutations::CreateLabel
     field :admin_delete_user, mutation: Mutations::AdminDeleteUser
     field :admin_update_user, mutation: Mutations::AdminUpdateUser
     field :admin_create_user, mutation: Mutations::AdminCreateUser

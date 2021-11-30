@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -14,6 +14,10 @@ import { useForm } from 'react-hook-form';
 import Button from '@mui/material/Button';
 import { Grid } from '@mui/material';
 import { Task } from 'utils/types';
+import LabelForm from 'common/LabelForm';
+import { GQL_LABELS } from 'utils/gql';
+import useQueryEx from 'hooks/useQueryEx';
+import { Label } from 'utils/types';
 
 export type Inputs = {
   title: string;
@@ -42,6 +46,12 @@ const TaskForm = (props: TaskFormProps) => {
     props.onAction(data);
   };
 
+  const { data } = useQueryEx(GQL_LABELS);
+  const [labels, setLabels] = useState(null as Label[]);
+  useEffect(() => {
+    if (data.labels) setLabels(data.labels);
+  }, [data]);
+
   return (
     <form>
       <TaskCard>
@@ -57,6 +67,16 @@ const TaskForm = (props: TaskFormProps) => {
               error={!!errors.title}
               helperText={errors.title && 'タイトルを入力してください'}
             />
+          </FormItem>
+          <FormItem>
+            {labels && (
+              <LabelForm
+                setValue={setValue}
+                defaultValue={props.task.labels?.map((label) => label.id) || []}
+                labels={labels}
+                setLabels={setLabels}
+              />
+            )}
           </FormItem>
           <FormItem>
             <TextField

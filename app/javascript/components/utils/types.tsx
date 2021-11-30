@@ -5,6 +5,12 @@ export type Done =
 
 export type PriorityNumber = 0 | 1 | 2;
 
+export interface Label {
+  id?: string;
+  name?: string;
+  tasksCount?: number;
+}
+
 export interface Task {
   id?: string;
   title?: string;
@@ -12,6 +18,7 @@ export interface Task {
   deadline?: string;
   done?: Done;
   priorityNumber?: PriorityNumber;
+  labels: Label[];
   createdAt?: string;
 }
 

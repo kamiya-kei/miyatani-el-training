@@ -8,6 +8,10 @@ RSpec.describe 'Tasks', type: :system do
     end
 
     let(:user) { FactoryBot.create(:user) }
+    let(:subject_sleep) {
+      subject
+      sleep 1
+    }
     describe 'タスクの作成' do
       let(:task) { FactoryBot.build(:task, user_id: user.id) }
 
@@ -27,13 +31,7 @@ RSpec.describe 'Tasks', type: :system do
           click_button '投稿'
           page
         }
-        it {
-          expect {
-            subject
-            sleep 1
-          }.to change { Task.count }.from(0).to(1)
-        }
-
+        it { expect { subject_sleep }.to change { Task.count }.from(0).to(1) }
         it { is_expected.to have_current_path('/') }
         it { is_expected.to have_content('タスクを投稿しました') }
 
@@ -50,13 +48,7 @@ RSpec.describe 'Tasks', type: :system do
           click_button '投稿'
         }
         it { is_expected.to have_no_content('タイトルを入力してください') }
-
-        it {
-          expect {
-            subject
-            sleep 1
-          }.not_to(change { Task.count })
-        }
+        it { expect { subject_sleep }.not_to(change { Task.count }) }
       end
 
       describe '入力するがキャンセル' do
@@ -67,12 +59,7 @@ RSpec.describe 'Tasks', type: :system do
           click_link 'キャンセル'
           page
         }
-        it {
-          expect {
-            subject
-            sleep 1
-          }.not_to(change { Task.count })
-        }
+        it { expect { subject_sleep }.not_to(change { Task.count }) }
 
         it '投稿されたタスクがタスク一覧に表示されている' do
           subject
@@ -89,6 +76,7 @@ RSpec.describe 'Tasks', type: :system do
 
       describe 'タスク一覧の編集ボタンをクリック' do
         subject {
+          visit '/'
           click_link '編集' # 編集ページへ
           page
         }
@@ -109,13 +97,7 @@ RSpec.describe 'Tasks', type: :system do
           click_button '更新'
           page
         }
-        it {
-          expect {
-            subject
-            sleep 1
-          }.not_to(change { Task.count })
-        }
-
+        it { expect { subject_sleep }.not_to(change { Task.count }) }
         it { is_expected.to have_current_path('/') }
         it { is_expected.to have_content('タスクを更新しました') }
 
@@ -140,13 +122,7 @@ RSpec.describe 'Tasks', type: :system do
           click_link 'キャンセル'
           page
         }
-        it {
-          expect {
-            subject
-            sleep 1
-          }.not_to(change { Task.count })
-        }
-
+        it { expect { subject_sleep }.not_to(change { Task.count }) }
         it { is_expected.to have_current_path('/') }
 
         it 'タスク一覧のタスクが更新されていない' do
@@ -177,14 +153,7 @@ RSpec.describe 'Tasks', type: :system do
           click_button 'はい'
           page
         }
-
-        it {
-          expect {
-            subject
-            sleep 1
-          }.to change { Task.count }.from(1).to(0)
-        }
-
+        it { expect { subject_sleep }.to change { Task.count }.from(1).to(0) }
         it { is_expected.to have_content('タスクが削除されました') }
 
         it 'タスク一覧から削除されたタスクが消えている' do
@@ -200,13 +169,7 @@ RSpec.describe 'Tasks', type: :system do
           click_button 'いいえ'
           page
         }
-
-        it {
-          expect {
-            subject
-            sleep 1
-          }.not_to(change { Task.count })
-        }
+        it { expect { subject_sleep }.not_to(change { Task.count }) }
 
         it 'タスク一覧から削除をキャンセルしたタスクが消えていない' do
           subject
@@ -227,6 +190,7 @@ RSpec.describe 'Tasks', type: :system do
 
       context 'ページ表示直後' do
         subject {
+          visit '/'
           sleep 1
           page.body
         }
@@ -311,11 +275,15 @@ RSpec.describe 'Tasks', type: :system do
           click_button 'search'
           page
         }
-        it { is_expected.to have_content(tasks[0].title) }
-        it { is_expected.to have_no_content(tasks[1].title) }
-        it { is_expected.to have_no_content(tasks[2].title) }
-        it { is_expected.to have_no_content(tasks[3].title) }
-        it { is_expected.to have_content(tasks[4].title) }
+        it {
+          subject
+          [0, 4].each do |i|
+            expect(page).to have_content(tasks[i].title)
+          end
+          [1, 2, 3].each do |i|
+            expect(page).to have_no_content(tasks[i].title)
+          end
+        }
       end
 
       describe '内容のキーワード検索＆ステータス着手・完了で検索' do
@@ -326,25 +294,32 @@ RSpec.describe 'Tasks', type: :system do
           click_button 'search'
           page
         }
-        it { is_expected.to have_no_content(tasks[0].title) }
-        it { is_expected.to have_content(tasks[1].title) }
-        it { is_expected.to have_no_content(tasks[2].title) }
-        it { is_expected.to have_content(tasks[3].title) }
-        it { is_expected.to have_no_content(tasks[4].title) }
+        it {
+          subject
+          [1, 3].each do |i|
+            expect(page).to have_content(tasks[i].title)
+          end
+          [0, 2, 4].each do |i|
+            expect(page).to have_no_content(tasks[i].title)
+          end
+        }
       end
     end
 
     describe 'ページネーション' do
-      let!(:tasks) {
+      before {
+        tasks
+        sleep 1
+        visit '/'
+      }
+
+      let(:tasks) {
         (0...20).
           map { |i| { created_at: Time.current.ago(i.days) } }.
           map { |args| FactoryBot.create(:task, user_id: user.id, **args) }
       }
-
       describe 'タスク一覧1ページ目' do
-        subject {
-          page
-        }
+        subject { page }
         it '10件のタスクのみ表示されている' do
           subject
           expect(page.all('.task-card').count).to eq 10
@@ -352,14 +327,16 @@ RSpec.describe 'Tasks', type: :system do
 
         it '最新10件が表示されている' do
           subject
-          expect(page).to have_content(tasks[0].title)
-          expect(page).to have_content(tasks[9].title)
+          (0..9).each do |i|
+            expect(page).to have_content(tasks[i].title)
+          end
         end
 
         it '最新10件以外のタスクが表示されていない' do
           subject
-          expect(page).to have_no_content(tasks[10].title)
-          expect(page).to have_no_content(tasks[19].title)
+          (10..19).each do |i|
+            expect(page).to have_no_content(tasks[i].title)
+          end
         end
       end
 
@@ -370,14 +347,16 @@ RSpec.describe 'Tasks', type: :system do
         }
         it '最新11-20件が表示されている' do
           subject
-          expect(page).to have_content(tasks[10].title)
-          expect(page).to have_content(tasks[19].title)
+          (10..19).each do |i|
+            expect(page).to have_content(tasks[i].title)
+          end
         end
 
         it '最新11-20件以外のタスクが表示されていない' do
           subject
-          expect(page).to have_no_content(tasks[0].title)
-          expect(page).to have_no_content(tasks[9].title)
+          (0..9).each do |i|
+            expect(page).to have_no_content(tasks[i].title)
+          end
         end
       end
     end

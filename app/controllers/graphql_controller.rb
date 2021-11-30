@@ -1,17 +1,16 @@
 class GraphqlController < ApplicationController
-  class AdminAuthorizationError < StandardError; end
-
   def execute
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
     context = {
-      session: session,
-      user: User.find_by(id: session[:user_id])
+      session: session
     }
     result = MiyataniElTrainingSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
-  rescue AdminAuthorizationError
+  rescue Application::AuthorizationError
+    render json: { error: { message: 'Authorization Error' } }, status: :forbidden
+  rescue Application::AdminAuthorizationError
     render json: { error: { message: 'Admin Authorization Error' } }, status: :forbidden
   rescue => e
     render json: { errors: [{ message: e.message }], data: {} }, status: :bad_request

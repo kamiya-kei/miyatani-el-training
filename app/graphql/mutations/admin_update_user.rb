@@ -10,15 +10,12 @@ module Mutations
     argument :role_id,               ID,     required: false
 
     def resolve(id:, **args)
-      user = context[:user]
-      unless user.role.id == Role::ADMIN
-        raise GraphqlController::AdminAuthorizationError
-      end
+      authenticate_admin!
 
-      target_user = User.find(id)
-      target_user.update!(args)
+      user = User.find(id)
+      user.update!(args)
       {
-        user: target_user
+        user: user
       }
     end
   end

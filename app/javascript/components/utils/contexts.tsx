@@ -19,6 +19,7 @@ interface UtilContext {
   util: {
     flashMessage: (message, severity?) => void;
     confirmDialog: (message?) => Promise<boolean>;
+    promptDialog: (message, defaultValue?) => Promise<string>;
     setBackdrop: (loading: boolean) => void;
   };
 }

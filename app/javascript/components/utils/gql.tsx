@@ -5,12 +5,16 @@ const TASK_FRAGMENT = gql`
     id
     title
     description
-    deadline
+    priorityNumber
     done {
       id
       text
     }
-    priorityNumber
+    labels {
+      id
+      name
+    }
+    deadline
     createdAt
   }
 `;
@@ -25,6 +29,7 @@ export const GQL_TASKS = gql`
     $sortType: String
     $isAsc: Boolean
     $target: String
+    $labelId: ID
   ) {
     tasks(
       userId: $userId
@@ -34,6 +39,7 @@ export const GQL_TASKS = gql`
       sortType: $sortType
       isAsc: $isAsc
       target: $target
+      labelId: $labelId
     ) {
       tasks {
         ...TaskFragment
@@ -61,6 +67,7 @@ export const GQL_CREATE_TASK = gql`
     $deadline: String
     $doneId: ID
     $priorityNumber: Int
+    $labelIds: [ID!]
   ) {
     createTask(
       input: {
@@ -69,6 +76,7 @@ export const GQL_CREATE_TASK = gql`
         deadline: $deadline
         doneId: $doneId
         priorityNumber: $priorityNumber
+        labelIds: $labelIds
       }
     ) {
       task {
@@ -87,6 +95,7 @@ export const GQL_UPDATE_TASK = gql`
     $deadline: String
     $doneId: ID
     $priorityNumber: Int
+    $labelIds: [ID!]
   ) {
     updateTask(
       input: {
@@ -96,6 +105,7 @@ export const GQL_UPDATE_TASK = gql`
         deadline: $deadline
         doneId: $doneId
         priorityNumber: $priorityNumber
+        labelIds: $labelIds
       }
     ) {
       task {
@@ -266,6 +276,56 @@ export const GQL_ADMIN_DELETE_USER = gql`
     adminDeleteUser(input: { id: $id }) {
       user {
         ...UserFragment
+      }
+    }
+  }
+`;
+
+const LABEL_FRAGMENT = gql`
+  fragment LabelFragment on Label {
+    id
+    name
+    tasksCount
+  }
+`;
+
+export const GQL_LABELS = gql`
+  ${LABEL_FRAGMENT}
+  query labels($userId: ID) {
+    labels(userId: $userId) {
+      ...LabelFragment
+    }
+  }
+`;
+
+export const GQL_CREATE_LABEL = gql`
+  ${LABEL_FRAGMENT}
+  mutation createLabel($name: String!) {
+    createLabel(input: { name: $name }) {
+      labels {
+        ...LabelFragment
+      }
+    }
+  }
+`;
+
+export const GQL_UPDATE_LABEL = gql`
+  ${LABEL_FRAGMENT}
+  mutation updateLabel($id: ID!, $name: String!) {
+    updateLabel(input: { id: $id, name: $name }) {
+      labels {
+        ...LabelFragment
+      }
+    }
+  }
+`;
+
+export const GQL_DELETE_LABEL = gql`
+  ${LABEL_FRAGMENT}
+  mutation deleteLabel($id: ID!) {
+    deleteLabel(input: { id: $id }) {
+      labels {
+        ...LabelFragment
       }
     }
   }
