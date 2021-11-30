@@ -2,14 +2,14 @@ module GraphqlHelper
   def authenticate_user!
     return if current_user.present?
 
-    raise GraphqlController::AdminAuthorizationError
+    raise Application::AuthorizationError
   end
 
   def authenticate_admin!
     authenticate_user!
     return if current_user.role.id == Role::ADMIN
 
-    raise GraphqlController::AuthorizationError
+    raise Application::AdminAuthorizationError
   end
 
   def target_user_id!(user_id)
